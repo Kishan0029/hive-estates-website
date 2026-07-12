@@ -24,7 +24,8 @@ export const Route = createFileRoute("/property/$id")({
 });
 
 function Detail() {
-  const p = Route.useLoaderData();
+  const p = Route.useLoaderData() as Property;
+
   const [main, setMain] = useState(p.gallery[0]);
   const [emi, setEmi] = useState({ amount: p.price, rate: 8.5, years: 20 });
   const similar = PROPERTIES.filter((x) => x.id !== p.id && x.listing === p.listing).slice(0, 4);
