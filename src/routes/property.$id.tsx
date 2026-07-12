@@ -1,14 +1,15 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
-import { formatINR, getProperty, PROPERTIES } from "@/lib/data";
+import { formatINR, getProperty, PROPERTIES, type Property } from "@/lib/data";
 import { PropertyGrid, Section } from "@/components/Section";
 
 export const Route = createFileRoute("/property/$id")({
-  loader: ({ params }) => {
+  loader: ({ params }): Property => {
     const p = getProperty(params.id);
     if (!p) throw notFound();
     return p;
   },
+
   head: ({ loaderData }) => ({
     meta: loaderData
       ? [
