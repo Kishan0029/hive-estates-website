@@ -45,7 +45,7 @@ export function PropertyCard({ p }: { p: Property }) {
 
         {/* Listing number top-right */}
         <div className="absolute top-3 right-3">
-          <span className="rounded-md bg-white/95 text-primary text-[11px] font-bold px-2 py-1 shadow-sm tracking-wide">
+          <span className="rounded-md bg-white/95 text-primary text-[13px] font-extrabold px-2.5 py-1 shadow-sm tracking-wide">
             #{p.listingNumber}
           </span>
         </div>
