@@ -1,103 +1,100 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SearchBar } from "@/components/SearchBar";
 import { PropertyGrid, Section } from "@/components/Section";
-import { AGENTS_LIST, BLOGS, BUILDERS_LIST, LOCALITIES, PROPERTIES } from "@/lib/data";
+import { LOCALITIES, PROPERTIES, HIVE_PHONE_DISPLAY } from "@/lib/data";
 
 export const Route = createFileRoute("/")({ component: Home });
 
 function Home() {
-  const featured = PROPERTIES.filter((p) => p.featured).slice(0, 4);
-  const premium = PROPERTIES.filter((p) => p.premium).slice(0, 4);
-  const latest = PROPERTIES.slice(0, 8);
-  const commercial = PROPERTIES.filter((p) => p.listing === "commercial").slice(0, 4);
-  const rentals = PROPERTIES.filter((p) => p.listing === "rent").slice(0, 4);
+  const featuredHomes = PROPERTIES.filter((p) => p.category === "home" && p.featured).slice(0, 4);
+  const featuredLand  = PROPERTIES.filter((p) => p.category === "land" && p.featured).slice(0, 4);
+  const latestHomes   = PROPERTIES.filter((p) => p.category === "home").slice(0, 4);
+  const latestLand    = PROPERTIES.filter((p) => p.category === "land").slice(0, 4);
 
   return (
     <>
-      {/* HERO */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 -z-10">
-          <img
-            src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1920&h=1080&fit=crop&auto=format&q=70"
-            alt=""
-            className="h-full w-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-primary/85 via-primary/70 to-primary/95" />
-        </div>
-        <div className="container-p mx-auto max-w-7xl pt-16 pb-24 md:pt-24 md:pb-32 text-primary-foreground">
-          <p className="text-sm font-semibold text-accent uppercase tracking-widest">Belagavi · Karnataka</p>
-          <h1 className="mt-3 font-display text-4xl md:text-6xl font-extrabold leading-tight max-w-3xl">
-            Find your next home in the heart of Belagavi
-          </h1>
-          <p className="mt-4 text-lg text-primary-foreground/80 max-w-xl">
-            Explore verified apartments, villas, plots and commercial spaces from trusted owners, agents and builders.
-          </p>
-          <div className="mt-8">
-            <SearchBar />
+      {/* HERO — pure white, NoBroker inspired */}
+      <section className="bg-background">
+        <div className="container-p mx-auto max-w-7xl pt-12 md:pt-20 pb-10">
+          <div className="text-center max-w-3xl mx-auto">
+            <p className="text-xs font-semibold text-primary uppercase tracking-widest">Belagavi · Karnataka</p>
+            <h1 className="mt-3 font-display text-4xl md:text-5xl lg:text-6xl font-extrabold text-foreground leading-tight">
+              Find Hive Verified property in Belagavi
+            </h1>
+            <p className="mt-4 text-base md:text-lg text-muted-foreground">
+              Buy land, apartments and bungalows directly from verified owners, agents and builders.
+            </p>
           </div>
-          <div className="mt-6 flex flex-wrap gap-2 text-sm">
-            <span className="text-primary-foreground/70">Trending:</span>
-            {LOCALITIES.slice(0, 6).map((l) => (
-              <Link key={l} to="/buy" className="px-3 py-1 rounded-full bg-white/10 hover:bg-accent hover:text-accent-foreground transition">
-                {l}
-              </Link>
-            ))}
+
+          {/* Category selector cards */}
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 max-w-4xl mx-auto">
+            <Link to="/apartments" className="group rounded-2xl border-2 border-border hover:border-primary bg-card p-6 text-left shadow-card hover:shadow-elevated transition">
+              <div className="flex items-start gap-4">
+                <div className="grid h-14 w-14 place-items-center rounded-xl bg-primary/10 text-primary text-2xl">🏢</div>
+                <div className="flex-1">
+                  <h3 className="font-display text-lg font-bold text-foreground">Apartments / Bungalows</h3>
+                  <p className="text-sm text-muted-foreground mt-1">Ready-to-move homes across Belagavi</p>
+                  <div className="mt-3 text-sm font-semibold text-primary group-hover:translate-x-1 transition">Browse homes →</div>
+                </div>
+              </div>
+            </Link>
+            <Link to="/land" className="group rounded-2xl border-2 border-border hover:border-primary bg-card p-6 text-left shadow-card hover:shadow-elevated transition">
+              <div className="flex items-start gap-4">
+                <div className="grid h-14 w-14 place-items-center rounded-xl bg-success/10 text-success text-2xl">🌾</div>
+                <div className="flex-1">
+                  <h3 className="font-display text-lg font-bold text-foreground">Land</h3>
+                  <p className="text-sm text-muted-foreground mt-1">NA and Non-NA plots in prime localities</p>
+                  <div className="mt-3 text-sm font-semibold text-primary group-hover:translate-x-1 transition">Browse land →</div>
+                </div>
+              </div>
+            </Link>
+          </div>
+
+          <div className="mt-8 max-w-4xl mx-auto">
+            <SearchBar />
+            <div className="mt-4 flex flex-wrap gap-2 text-sm justify-center">
+              <span className="text-muted-foreground">Popular:</span>
+              {LOCALITIES.slice(0, 6).map((l) => (
+                <Link key={l} to="/buy" search={{ q: l }} className="px-3 py-1 rounded-full bg-secondary text-primary hover:bg-primary hover:text-primary-foreground transition text-xs font-medium">
+                  {l}
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
       {/* STATS */}
-      <section className="container-p mx-auto max-w-7xl -mt-12 relative z-10">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 rounded-2xl bg-card border border-border shadow-elevated p-6">
+      <section className="container-p mx-auto max-w-7xl mt-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            ["10K+", "Verified Listings"],
-            ["500+", "Trusted Agents"],
-            ["120+", "Top Builders"],
-            ["20+", "Belagavi Localities"],
-          ].map(([n, l]) => (
-            <div key={l} className="text-center">
-              <div className="font-display text-2xl md:text-3xl font-bold text-primary">{n}</div>
-              <div className="text-xs text-muted-foreground mt-1">{l}</div>
+            { icon: "📈", n: "200+", l: "Plots Sold" },
+            { icon: "✓",  n: "100%", l: "Hive Verified Properties" },
+            { icon: "🤝", n: "50+",  l: "Trusted Local Experts" },
+            { icon: "⚡", n: "24×7", l: "Fast Property Assistance" },
+          ].map((s) => (
+            <div key={s.l} className="rounded-xl border border-border bg-card p-5 text-center shadow-card">
+              <div className="text-2xl">{s.icon}</div>
+              <div className="mt-2 font-display text-2xl font-bold text-primary">{s.n}</div>
+              <div className="text-xs text-muted-foreground mt-1">{s.l}</div>
             </div>
           ))}
         </div>
       </section>
 
-      <Section title="Featured Properties" subtitle="Handpicked homes across Belagavi" viewAll="/buy">
-        <PropertyGrid items={featured} />
+      <Section title="Featured Land Listings" subtitle="Hand-picked plots across Belagavi" viewAll="/land">
+        <PropertyGrid items={featuredLand.length ? featuredLand : latestLand} />
       </Section>
 
-      {/* CATEGORY TILES */}
-      <Section title="Explore by category">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            { to: "/buy", label: "Buy a Home", desc: "Apartments & Villas", tint: "bg-primary text-primary-foreground" },
-            { to: "/rent", label: "Rent", desc: "Flexible rentals", tint: "bg-accent text-accent-foreground" },
-            { to: "/commercial", label: "Commercial", desc: "Offices & retail", tint: "bg-success text-success-foreground" },
-            { to: "/plots", label: "Plots & Land", desc: "Residential plots", tint: "bg-foreground text-background" },
-          ].map((c) => (
-            <Link key={c.to} to={c.to} className={`rounded-xl p-6 ${c.tint} shadow-card hover:shadow-elevated transition group`}>
-              <div className="text-lg font-semibold">{c.label}</div>
-              <div className="text-sm opacity-80 mt-1">{c.desc}</div>
-              <div className="mt-6 text-sm font-medium opacity-90 group-hover:translate-x-1 transition">Browse →</div>
-            </Link>
-          ))}
-        </div>
-      </Section>
-
-      <Section title="Premium Listings" subtitle="Luxury properties in prime locations" viewAll="/buy">
-        <PropertyGrid items={premium} />
-      </Section>
-
-      <Section title="Latest Listings" subtitle="Just added in Belagavi" viewAll="/buy">
-        <PropertyGrid items={latest} />
+      <Section title="Featured Apartments & Bungalows" subtitle="Verified homes in prime localities" viewAll="/apartments">
+        <PropertyGrid items={featuredHomes.length ? featuredHomes : latestHomes} />
       </Section>
 
       {/* LOCALITIES */}
       <Section title="Popular Localities in Belagavi">
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
           {LOCALITIES.slice(0, 10).map((l) => (
-            <Link key={l} to="/buy" className="rounded-lg border border-border bg-card px-4 py-3 hover:border-accent hover:shadow-card transition">
+            <Link key={l} to="/buy" search={{ q: l }} className="rounded-lg border border-border bg-card px-4 py-3 hover:border-primary hover:shadow-card transition">
               <div className="font-medium text-sm">{l}</div>
               <div className="text-xs text-muted-foreground mt-0.5">Belagavi</div>
             </Link>
@@ -105,110 +102,79 @@ function Home() {
         </div>
       </Section>
 
-      <Section title="Commercial Spaces" subtitle="Offices, retail and warehouses" viewAll="/commercial">
-        <PropertyGrid items={commercial} />
-      </Section>
-
-      <Section title="Rental Properties" subtitle="Ready-to-move rentals" viewAll="/rent">
-        <PropertyGrid items={rentals} />
-      </Section>
-
-      {/* BUILDERS */}
-      <Section title="Top Builders in Belagavi" viewAll="/builders">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {BUILDERS_LIST.slice(0, 4).map((b) => (
-            <div key={b.id} className="rounded-xl border border-border bg-card overflow-hidden shadow-card hover:shadow-elevated transition">
-              <div className="aspect-[4/3] bg-muted overflow-hidden">
-                <img src={b.image} alt={b.name} loading="lazy" className="h-full w-full object-cover" />
+      {/* Want to list your property */}
+      <section className="container-p mx-auto max-w-7xl mt-20">
+        <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-card">
+          <div className="grid md:grid-cols-[1.1fr_1fr]">
+            <div className="p-8 md:p-10">
+              <div className="text-xs font-semibold text-primary uppercase tracking-widest">List with Hive Estate</div>
+              <h2 className="mt-3 font-display text-3xl md:text-4xl font-bold text-foreground">
+                Want to list your property?
+              </h2>
+              <p className="mt-3 text-muted-foreground max-w-lg">
+                Landowners and homeowners across Belagavi trust Hive Estate to reach genuine buyers. Free to list, Hive Verified badge included, personal assistance from our local team.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link to="/post-property" className="inline-flex items-center rounded-md bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 shadow-sm">
+                  List Property
+                </Link>
+                <a
+                  href={`https://wa.me/919000000000?text=${encodeURIComponent("Hello, I would like to list my property with Hive Estate. Please guide me through the process.")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-6 py-3 text-sm font-semibold text-foreground hover:border-success hover:text-success"
+                >
+                  💬 WhatsApp
+                </a>
               </div>
-              <div className="p-4">
-                <div className="font-semibold">{b.name}</div>
-                <div className="text-xs text-muted-foreground mt-1">{b.projects} projects · ⭐ {b.rating}</div>
-              </div>
+              <p className="mt-4 text-xs text-muted-foreground">Prefer to call? {HIVE_PHONE_DISPLAY}</p>
             </div>
-          ))}
-        </div>
-      </Section>
 
-      {/* AGENTS */}
-      <Section title="Top Agents in Belagavi" viewAll="/agents">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {AGENTS_LIST.slice(0, 3).map((a) => (
-            <div key={a.id} className="rounded-xl border border-border bg-card p-5 flex gap-4 shadow-card">
-              <img src={a.image} alt={a.name} className="h-16 w-16 rounded-full object-cover" loading="lazy" />
-              <div className="flex-1">
-                <div className="font-semibold">{a.name}</div>
-                <div className="text-xs text-muted-foreground mt-1">{a.experience} yrs · ⭐ {a.rating} · {a.deals} deals</div>
-                <div className="text-xs text-muted-foreground">Specializes in {a.locality}</div>
-              </div>
+            <div className="bg-secondary p-8 md:p-10 border-t md:border-t-0 md:border-l border-border">
+              <h3 className="font-semibold text-foreground">What you'll need to list</h3>
+              <p className="text-xs text-muted-foreground mt-1">Common documents & details we'll ask for</p>
+              <ul className="mt-4 grid grid-cols-1 gap-2 text-sm">
+                {[
+                  "Sale Deed / Title Deed",
+                  "RTC / 7/12 Extract (where applicable)",
+                  "Khata / Property Card",
+                  "Mutation Records",
+                  "Encumbrance Certificate (EC)",
+                  "Approved Layout / Conversion Documents (if applicable)",
+                  "Identity Proof of Owner",
+                  "Address Proof",
+                  "Latest Property Tax Receipt",
+                  "Survey Number",
+                  "Property Photographs",
+                  "Location Details",
+                  "Plot Dimensions",
+                  "Road Access Details",
+                  "Utility Availability (Water / Electricity)",
+                  "Any applicable approvals",
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2">
+                    <span className="mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full bg-success text-success-foreground text-[10px] font-bold">✓</span>
+                    <span className="text-foreground/80">{item}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
-          ))}
-        </div>
-      </Section>
-
-      {/* HOME LOAN + POST PROPERTY CTA */}
-      <section className="container-p mx-auto max-w-7xl mt-20 grid gap-6 md:grid-cols-2">
-        <div className="rounded-2xl bg-primary text-primary-foreground p-8">
-          <div className="text-sm text-accent font-semibold uppercase tracking-widest">Home Loans</div>
-          <h3 className="mt-3 text-2xl font-bold">Get pre-approved in minutes</h3>
-          <p className="mt-2 text-primary-foreground/70 text-sm">Compare offers from leading banks. Calculate your EMI and check eligibility instantly.</p>
-          <Link to="/contact" className="mt-6 inline-flex rounded-md bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground">Explore Loans</Link>
-        </div>
-        <div className="rounded-2xl bg-accent text-accent-foreground p-8">
-          <div className="text-sm font-semibold uppercase tracking-widest opacity-80">Sell / Rent Faster</div>
-          <h3 className="mt-3 text-2xl font-bold">Post your property for free</h3>
-          <p className="mt-2 text-accent-foreground/80 text-sm">Reach thousands of buyers and tenants across Belagavi. Free listing, verified badge included.</p>
-          <Link to="/post-property" className="mt-6 inline-flex rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">Post Now</Link>
+          </div>
         </div>
       </section>
-
-      {/* BLOGS */}
-      <Section title="Property Guides & Blogs" viewAll="/blogs">
-        <div className="grid gap-5 md:grid-cols-3">
-          {BLOGS.map((b) => (
-            <article key={b.id} className="rounded-xl border border-border bg-card overflow-hidden shadow-card hover:shadow-elevated transition">
-              <div className="aspect-[16/10] bg-muted overflow-hidden">
-                <img src={b.image} alt={b.title} loading="lazy" className="h-full w-full object-cover" />
-              </div>
-              <div className="p-5">
-                <div className="text-xs text-muted-foreground">{b.date}</div>
-                <h3 className="mt-1 font-semibold">{b.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{b.excerpt}</p>
-              </div>
-            </article>
-          ))}
-        </div>
-      </Section>
-
-      {/* TESTIMONIALS */}
-      <Section title="What our customers say">
-        <div className="grid gap-5 md:grid-cols-3">
-          {[
-            { n: "Anita Kulkarni", r: "Found our 3BHK in Tilakwadi in under two weeks. Verified listings saved us so much time.", loc: "Home Buyer" },
-            { n: "Rakesh Shetty", r: "Great platform for commercial spaces. Got quality leads within days of listing.", loc: "Owner" },
-            { n: "Mohan Rao", r: "Transparent process, professional agents. Highly recommend Hive Estate.", loc: "NRI Investor" },
-          ].map((t) => (
-            <div key={t.n} className="rounded-xl border border-border bg-card p-6 shadow-card">
-              <div className="text-accent">★★★★★</div>
-              <p className="mt-3 text-sm text-foreground/80">"{t.r}"</p>
-              <div className="mt-4 text-sm"><span className="font-semibold">{t.n}</span> <span className="text-muted-foreground">· {t.loc}</span></div>
-            </div>
-          ))}
-        </div>
-      </Section>
 
       {/* FAQ */}
       <Section title="Frequently asked questions">
         <div className="grid gap-3 md:grid-cols-2">
           {[
-            ["Is posting a property free?", "Yes, listing your property on Hive Estate is completely free for owners and agents."],
-            ["How are properties verified?", "Our team physically or digitally verifies documents and photos before assigning a verified badge."],
-            ["Do you cover only Belagavi?", "Currently we focus exclusively on Belagavi and surrounding localities."],
-            ["Can I get home loan assistance?", "Yes, we connect you with leading banks and NBFCs for the best home loan offers."],
+            ["What does Hive Verified mean?", "Every property on Hive Estate is checked by our local team for genuine ownership, correct location, photos and pricing before it appears with the Hive Verified badge."],
+            ["Is listing a property free?", "Yes. Owners and agents can list on Hive Estate at zero cost. We only charge for premium visibility packages if you choose them."],
+            ["Do you cover only Belagavi?", "We currently focus exclusively on Belagavi city and the surrounding localities like Tilakwadi, Vadgaon, Shahapur, Machhe, Kanbargi and Kakati."],
+            ["Do you help with land documentation?", "Yes, we can connect you with trusted legal advisors in Belagavi for title verification, RTC checks and NA conversion."],
           ].map(([q, a]) => (
             <details key={q} className="rounded-lg border border-border bg-card p-4 group">
               <summary className="font-semibold cursor-pointer list-none flex justify-between items-center">
-                {q}<span className="text-accent group-open:rotate-45 transition">+</span>
+                {q}<span className="text-primary group-open:rotate-45 transition">+</span>
               </summary>
               <p className="mt-3 text-sm text-muted-foreground">{a}</p>
             </details>

@@ -1,60 +1,87 @@
 import { useMemo, useState } from "react";
-import { PROPERTIES, type Property } from "@/lib/data";
+import { PROPERTIES, searchProperties, type Category, type Property } from "@/lib/data";
 import { PropertyGrid } from "./Section";
 
-type Mode = Property["listing"];
+type Mode = "buy" | "land" | "apartments";
 
 const TITLES: Record<Mode, { title: string; subtitle: string }> = {
-  buy: { title: "Properties for Sale in Belagavi", subtitle: "Verified apartments, villas and independent homes" },
-  rent: { title: "Rental Properties in Belagavi", subtitle: "Fully furnished, semi-furnished and unfurnished options" },
-  commercial: { title: "Commercial Properties in Belagavi", subtitle: "Offices, retail spaces and warehouses" },
-  plots: { title: "Plots & Land in Belagavi", subtitle: "Residential and NA plots across prime localities" },
+  buy:        { title: "Properties for Sale in Belagavi",         subtitle: "Hive Verified land, apartments and bungalows" },
+  land:       { title: "Land & Plots for Sale in Belagavi",       subtitle: "NA and Non-NA plots across prime localities" },
+  apartments: { title: "Apartments & Bungalows in Belagavi",      subtitle: "Verified homes from trusted owners and builders" },
 };
 
-export function ListingsPage({ mode }: { mode: Mode }) {
-  const base = useMemo(() => PROPERTIES.filter((p) => p.listing === mode), [mode]);
-  const [type, setType] = useState("");
+const baseFor = (mode: Mode): Property[] => {
+  if (mode === "land") return PROPERTIES.filter((p) => p.category === "land");
+  if (mode === "apartments") return PROPERTIES.filter((p) => p.category === "home");
+  return PROPERTIES;
+};
+
+export function ListingsPage({ mode, initialQuery = "" }: { mode: Mode; initialQuery?: string }) {
+  const base = useMemo(() => baseFor(mode), [mode]);
+  const [query, setQuery] = useState(initialQuery);
+  const [subType, setSubType] = useState<string>("");
   const [bhk, setBhk] = useState("");
-  const [status, setStatus] = useState("");
+  const [ownership, setOwnership] = useState<string>("");
+  const [naFilter, setNaFilter] = useState<string>("");
   const [max, setMax] = useState<number>(0);
-  const [verified, setVerified] = useState(false);
   const [sort, setSort] = useState("relevance");
 
-  const filtered = useMemo(() => {
-    let out = base.filter((p) => {
-      if (type && p.type !== type) return false;
+  const result = useMemo(() => {
+    let items = base.filter((p) => {
+      if (subType && p.subType !== subType) return false;
       if (bhk && String(p.bhk) !== bhk) return false;
-      if (status && p.status !== status) return false;
-      if (verified && !p.verified) return false;
+      if (ownership && p.land?.ownership !== ownership) return false;
+      if (naFilter && p.land?.naStatus !== naFilter) return false;
       if (max && p.price > max) return false;
       return true;
     });
-    if (sort === "price-asc") out = [...out].sort((a, b) => a.price - b.price);
-    if (sort === "price-desc") out = [...out].sort((a, b) => b.price - a.price);
-    if (sort === "area") out = [...out].sort((a, b) => b.area - a.area);
-    return out;
-  }, [base, type, bhk, status, verified, max, sort]);
+    if (sort === "price-asc") items = [...items].sort((a, b) => a.price - b.price);
+    if (sort === "price-desc") items = [...items].sort((a, b) => b.price - a.price);
+    if (sort === "area") items = [...items].sort((a, b) => b.area - a.area);
+    return searchProperties(items, query);
+  }, [base, subType, bhk, ownership, naFilter, max, sort, query]);
 
   const info = TITLES[mode];
+  const totalCount = result.primary.length + result.nearby.length;
+
+  const homeSubTypes = ["Apartment", "Bungalow"];
+  const landSubTypes = ["NA Plot", "Non-NA Plot"];
+  const availableSubTypes = mode === "land" ? landSubTypes : mode === "apartments" ? homeSubTypes : [...homeSubTypes, ...landSubTypes];
 
   return (
     <div className="container-p mx-auto max-w-7xl mt-8">
       <header className="mb-6">
         <h1 className="text-2xl md:text-3xl font-bold text-foreground">{info.title}</h1>
-        <p className="text-sm text-muted-foreground mt-1">{info.subtitle} · {filtered.length} results</p>
+        <p className="text-sm text-muted-foreground mt-1">{info.subtitle} · {totalCount} results</p>
       </header>
+
+      {/* Inline search */}
+      <div className="mb-6 rounded-xl border border-border bg-card p-3 flex gap-2">
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search by locality, area, tags or keywords (e.g. Tilakwadi, NA, 3 BHK)"
+          className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+        />
+        {query && (
+          <button onClick={() => setQuery("")} className="rounded-md border border-border px-3 py-2 text-sm text-muted-foreground hover:text-primary">
+            Clear
+          </button>
+        )}
+      </div>
 
       <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
         <aside className="lg:sticky lg:top-20 lg:self-start rounded-xl border border-border bg-card p-5 shadow-card">
           <h3 className="font-semibold mb-4">Filters</h3>
           <div className="space-y-4 text-sm">
             <FilterGroup label="Property Type">
-              <select value={type} onChange={(e) => setType(e.target.value)} className="w-full rounded-md border border-border bg-background px-2 py-2">
+              <select value={subType} onChange={(e) => setSubType(e.target.value)} className="w-full rounded-md border border-border bg-background px-2 py-2">
                 <option value="">All</option>
-                {["Apartment", "Villa", "Plot", "Commercial", "Office", "Warehouse"].map((t) => <option key={t}>{t}</option>)}
+                {availableSubTypes.map((t) => <option key={t}>{t}</option>)}
               </select>
             </FilterGroup>
-            {mode !== "plots" && mode !== "commercial" && (
+
+            {mode !== "land" && (
               <FilterGroup label="BHK">
                 <div className="flex flex-wrap gap-2">
                   {["", "1", "2", "3", "4"].map((b) => (
@@ -65,38 +92,41 @@ export function ListingsPage({ mode }: { mode: Mode }) {
                 </div>
               </FilterGroup>
             )}
+
+            {mode !== "apartments" && (
+              <>
+                <FilterGroup label="NA Status">
+                  <select value={naFilter} onChange={(e) => setNaFilter(e.target.value)} className="w-full rounded-md border border-border bg-background px-2 py-2">
+                    <option value="">Any</option>
+                    <option>NA</option>
+                    <option>Non-NA</option>
+                  </select>
+                </FilterGroup>
+                <FilterGroup label="Ownership">
+                  <select value={ownership} onChange={(e) => setOwnership(e.target.value)} className="w-full rounded-md border border-border bg-background px-2 py-2">
+                    <option value="">Any</option>
+                    <option>Agricultural</option>
+                    <option>Residential</option>
+                    <option>Converted</option>
+                  </select>
+                </FilterGroup>
+              </>
+            )}
+
             <FilterGroup label="Max Budget">
               <select value={max} onChange={(e) => setMax(Number(e.target.value))} className="w-full rounded-md border border-border bg-background px-2 py-2">
                 <option value={0}>Any</option>
-                {mode === "rent" ? (
-                  <>
-                    <option value={20000}>Under ₹20K</option>
-                    <option value={40000}>Under ₹40K</option>
-                    <option value={80000}>Under ₹80K</option>
-                  </>
-                ) : (
-                  <>
-                    <option value={5000000}>Under ₹50 L</option>
-                    <option value={10000000}>Under ₹1 Cr</option>
-                    <option value={20000000}>Under ₹2 Cr</option>
-                    <option value={50000000}>Under ₹5 Cr</option>
-                  </>
-                )}
+                <option value={5000000}>Under ₹50 L</option>
+                <option value={10000000}>Under ₹1 Cr</option>
+                <option value={20000000}>Under ₹2 Cr</option>
+                <option value={50000000}>Under ₹5 Cr</option>
               </select>
             </FilterGroup>
-            <FilterGroup label="Construction Status">
-              <select value={status} onChange={(e) => setStatus(e.target.value)} className="w-full rounded-md border border-border bg-background px-2 py-2">
-                <option value="">Any</option>
-                <option>Ready to Move</option>
-                <option>Under Construction</option>
-                <option>New Launch</option>
-              </select>
-            </FilterGroup>
-            <label className="flex items-center gap-2">
-              <input type="checkbox" checked={verified} onChange={(e) => setVerified(e.target.checked)} />
-              <span>Verified only</span>
-            </label>
-            <button onClick={() => { setType(""); setBhk(""); setStatus(""); setMax(0); setVerified(false); }} className="w-full mt-2 text-xs text-accent font-semibold hover:underline">
+
+            <button
+              onClick={() => { setSubType(""); setBhk(""); setOwnership(""); setNaFilter(""); setMax(0); setQuery(""); }}
+              className="w-full mt-2 text-xs text-primary font-semibold hover:underline"
+            >
               Clear all filters
             </button>
           </div>
@@ -104,7 +134,12 @@ export function ListingsPage({ mode }: { mode: Mode }) {
 
         <div>
           <div className="mb-4 flex items-center justify-between gap-3">
-            <p className="text-sm text-muted-foreground">Showing <span className="font-semibold text-foreground">{filtered.length}</span> properties</p>
+            <p className="text-sm text-muted-foreground">
+              Showing <span className="font-semibold text-foreground">{totalCount}</span> properties
+              {result.matchedLocality && (
+                <span> in and around <span className="font-semibold text-primary">{result.matchedLocality}</span></span>
+              )}
+            </p>
             <select value={sort} onChange={(e) => setSort(e.target.value)} className="rounded-md border border-border bg-background px-3 py-2 text-sm">
               <option value="relevance">Sort: Relevance</option>
               <option value="price-asc">Price: Low to High</option>
@@ -112,12 +147,32 @@ export function ListingsPage({ mode }: { mode: Mode }) {
               <option value="area">Area: Largest</option>
             </select>
           </div>
-          {filtered.length === 0 ? (
+
+          {totalCount === 0 ? (
             <div className="rounded-xl border border-dashed border-border p-12 text-center text-muted-foreground">
-              No properties match your filters.
+              No properties match your search.
             </div>
           ) : (
-            <PropertyGrid items={filtered} />
+            <>
+              {result.primary.length > 0 && (
+                <section>
+                  {result.matchedLocality && (
+                    <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+                      Properties in {result.matchedLocality}
+                    </h2>
+                  )}
+                  <PropertyGrid items={result.primary} />
+                </section>
+              )}
+              {result.nearby.length > 0 && (
+                <section className="mt-10">
+                  <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+                    Nearby areas around {result.matchedLocality}
+                  </h2>
+                  <PropertyGrid items={result.nearby} />
+                </section>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -133,3 +188,6 @@ function FilterGroup({ label, children }: { label: string; children: React.React
     </div>
   );
 }
+
+// Re-export for convenience (unused but kept for tree-shaking friendliness)
+export type { Category };
