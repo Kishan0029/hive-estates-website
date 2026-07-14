@@ -48,11 +48,7 @@ function Detail() {
           Listing #{p.id}
         </span>
         <HiveVerifiedBadge large />
-        {p.featured && (
-          <span className="rounded-md bg-accent text-accent-foreground text-xs font-bold px-3 py-1.5">
-            FEATURED
-          </span>
-        )}
+
         {p.premium && (
           <span className="rounded-md bg-primary text-primary-foreground text-xs font-bold px-3 py-1.5">
             PREMIUM

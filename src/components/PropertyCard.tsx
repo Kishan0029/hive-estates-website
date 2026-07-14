@@ -35,11 +35,7 @@ export function PropertyCard({ p }: { p: Property }) {
         {/* Left badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-1.5">
           <HiveVerifiedBadge />
-          {p.featured && (
-            <span className="rounded-md bg-accent text-accent-foreground text-[10px] font-bold px-2 py-1 shadow-sm">
-              FEATURED
-            </span>
-          )}
+
           {p.premium && (
             <span className="rounded-md bg-primary text-primary-foreground text-[10px] font-bold px-2 py-1 shadow-sm">
               PREMIUM

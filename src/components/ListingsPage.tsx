@@ -32,7 +32,7 @@ export function ListingsPage({ mode, initialQuery = "" }: { mode: Mode; initialQ
   const [subType, setSubType] = useState<string>("");
   const [bhk, setBhk] = useState("");
   const [ownership, setOwnership] = useState<string>("");
-  const [naFilter, setNaFilter] = useState<string>("");
+
   const [max, setMax] = useState<number>(0);
   const [sort, setSort] = useState("relevance");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
@@ -42,7 +42,7 @@ export function ListingsPage({ mode, initialQuery = "" }: { mode: Mode; initialQ
       if (subType && p.propertyType !== subType) return false;
       if (bhk && String(p.bhk) !== bhk) return false;
       if (ownership && p.land?.ownershipType !== ownership) return false;
-      if (naFilter && p.land?.naStatus !== naFilter) return false;
+
       if (max && p.price > max) return false;
       return true;
     });
@@ -50,11 +50,11 @@ export function ListingsPage({ mode, initialQuery = "" }: { mode: Mode; initialQ
     if (sort === "price-desc") items = [...items].sort((a, b) => b.price - a.price);
     if (sort === "area") items = [...items].sort((a, b) => b.area - a.area);
     return searchProperties(items, query);
-  }, [base, subType, bhk, ownership, naFilter, max, sort, query]);
+  }, [base, subType, bhk, ownership, max, sort, query]);
 
   const info = TITLES[mode];
   const totalCount = result.primary.length + result.nearby.length;
-  const hasActiveFilters = subType || bhk || ownership || naFilter || max || query;
+  const hasActiveFilters = subType || bhk || ownership || max || query;
 
   const homeSubTypes = ["Apartment", "Bungalow"];
   const landSubTypes = ["NA Plot", "Non-NA Plot"];
@@ -62,7 +62,7 @@ export function ListingsPage({ mode, initialQuery = "" }: { mode: Mode; initialQ
     mode === "land" ? landSubTypes : mode === "apartments" ? homeSubTypes : [...homeSubTypes, ...landSubTypes];
 
   const clearAll = () => {
-    setSubType(""); setBhk(""); setOwnership(""); setNaFilter(""); setMax(0); setQuery("");
+    setSubType(""); setBhk(""); setOwnership(""); setMax(0); setQuery("");
   };
 
   const FiltersPanel = () => (
@@ -113,25 +113,7 @@ export function ListingsPage({ mode, initialQuery = "" }: { mode: Mode; initialQ
         </div>
       )}
 
-      {/* NA Status (land only) */}
-      {mode !== "apartments" && (
-        <div>
-          <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-2.5">NA Status</p>
-          <div className="flex flex-wrap gap-2">
-            {["", "NA", "Non-NA"].map((v) => (
-              <button
-                key={v || "any"}
-                onClick={() => setNaFilter(v)}
-                className={`px-3.5 py-1.5 rounded-lg border text-xs font-medium transition ${
-                  naFilter === v ? "border-primary bg-primary text-white" : "border-border hover:border-primary/40 text-foreground"
-                }`}
-              >
-                {v || "Any"}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+
 
       {/* Ownership */}
       {mode !== "apartments" && (
