@@ -15,7 +15,7 @@ export function Section({
 }) {
   return (
     <section className="container-p mx-auto max-w-7xl mt-16">
-      <div className="flex items-end justify-between gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 sm:gap-4 mb-6">
         <div>
           <h2 className="text-2xl md:text-3xl font-bold text-foreground">{title}</h2>
           {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}

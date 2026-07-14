@@ -19,7 +19,7 @@ function Home() {
 
           {/* HEADLINE */}
           <div className="text-center max-w-2xl mx-auto">
-            <h1 className="font-display text-4xl md:text-5xl lg:text-[56px] font-extrabold text-foreground leading-tight tracking-tight">
+            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-[56px] font-extrabold text-foreground leading-tight tracking-tight">
               Find your perfect property in{" "}
               <span className="text-primary">Belagavi</span>
             </h1>
@@ -29,7 +29,7 @@ function Home() {
           </div>
 
           {/* TRUST BADGES */}
-          <div className="mt-8 flex flex-wrap justify-center gap-4">
+          <div className="mt-8 flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-4 items-center">
             {[
               { icon: "✓", label: "100% Hive Verified Properties", iconColor: "text-success", iconBg: "bg-success/15" },
               { icon: "🏠", label: "200+ Properties Sold", iconColor: "text-accent-foreground", iconBg: "bg-accent/25" },
@@ -138,7 +138,7 @@ function Home() {
               key={l}
               to="/buy"
               search={{ q: l }}
-              className="rounded-xl border border-border bg-card px-4 py-4 hover:border-primary hover:shadow-card transition group"
+              className="rounded-xl border border-border bg-card px-3 py-3 sm:px-4 sm:py-4 hover:border-primary hover:shadow-card transition group"
             >
               <div className="w-8 h-8 rounded-lg bg-primary/10 grid place-items-center mb-2">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">

@@ -19,7 +19,7 @@ export function SearchBar({ defaultMode = "apartments" }: { defaultMode?: Mode }
       onSubmit={submit}
       className="rounded-2xl bg-background border border-border shadow-elevated p-4 md:p-5"
     >
-      <div className="flex gap-2 mb-3">
+      <div className="flex flex-col sm:flex-row gap-2 mb-3">
         <button
           type="button"
           onClick={() => setMode("apartments")}
