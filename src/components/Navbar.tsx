@@ -39,10 +39,7 @@ export function Navbar() {
             to="/post-property"
             className="group inline-flex items-center gap-1.5 rounded-full bg-primary px-3 sm:px-4 py-1.5 sm:py-2 text-[13px] font-bold text-primary-foreground shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
           >
-            <span>List Property</span>
-            <span className="hidden sm:flex items-center justify-center rounded-full bg-white text-primary px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-widest shadow-sm group-hover:scale-110 transition-transform">
-              Free
-            </span>
+            <span>List your property</span>
           </Link>
           <button
             aria-label="Menu"
