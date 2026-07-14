@@ -4,7 +4,7 @@ import { AGENTS_LIST } from "@/lib/data";
 export const Route = createFileRoute("/agents")({
   head: () => ({
     meta: [
-      { title: "Real Estate Agents in Belagavi — Hive Estate" },
+      { title: "Real Estate Agents in Belagavi — Hive Estate" }, { property: 'og:title', content: "Real Estate Agents in Belagavi — Hive Estate" },
       {
         name: "description",
         content: "Connect with experienced and verified real estate agents in Belagavi.",

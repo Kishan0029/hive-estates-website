@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/terms")({
-  head: () => ({ meta: [{ title: "Terms of Use — Hive Estate" }] }),
+  head: () => ({ meta: [{ title: "Terms of Use — Hive Estate" }, { property: 'og:title', content: "Terms of Use — Hive Estate" }] }),
   component: () => (
     <div className="container-p mx-auto max-w-3xl mt-10">
       <h1 className="text-3xl font-bold">Terms of Use</h1>

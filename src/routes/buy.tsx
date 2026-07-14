@@ -10,7 +10,7 @@ export const Route = createFileRoute("/buy")({
   validateSearch: (s: Record<string, unknown>) => ({ q: typeof s.q === "string" ? s.q : "" }),
   head: () => ({
     meta: [
-      { title: "Properties for Sale in Belagavi — Hive Estate" },
+      { title: "Properties for Sale in Belagavi — Hive Estate" }, { property: 'og:title', content: "Properties for Sale in Belagavi — Hive Estate" },
       {
         name: "description",
         content: "Browse Hive Verified land, apartments and bungalows for sale in Belagavi.",

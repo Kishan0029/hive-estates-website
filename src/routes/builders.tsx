@@ -4,7 +4,7 @@ import { BUILDERS_LIST } from "@/lib/data";
 export const Route = createFileRoute("/builders")({
   head: () => ({
     meta: [
-      { title: "Top Builders in Belagavi — Hive Estate" },
+      { title: "Top Builders in Belagavi — Hive Estate" }, { property: 'og:title', content: "Top Builders in Belagavi — Hive Estate" },
       {
         name: "description",
         content: "Explore trusted real estate developers and builders in Belagavi.",

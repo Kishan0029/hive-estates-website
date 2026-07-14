@@ -6,7 +6,7 @@ import { WhatsAppIcon } from "@/components/WhatsApp";
 export const Route = createFileRoute("/hive-verified")({
   head: () => ({
     meta: [
-      { title: "Hive Verified Properties — Belagavi's Most Trusted Listings" },
+      { title: "Hive Verified Properties — Belagavi's Most Trusted Listings" }, { property: 'og:title', content: "Hive Verified Properties — Belagavi's Most Trusted Listings" },
       {
         name: "description",
         content:

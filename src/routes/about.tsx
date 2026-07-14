@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About Hive Estate — Belagavi Real Estate" },
+      { title: "About Hive Estate — Belagavi Real Estate" }, { property: 'og:title', content: "About Hive Estate — Belagavi Real Estate" },
       {
         name: "description",
         content:

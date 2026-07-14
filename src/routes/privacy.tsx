@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/privacy")({
-  head: () => ({ meta: [{ title: "Privacy Policy — Hive Estate" }] }),
+  head: () => ({ meta: [{ title: "Privacy Policy — Hive Estate" }, { property: 'og:title', content: "Privacy Policy — Hive Estate" }] }),
   component: () => (
     <div className="container-p mx-auto max-w-3xl mt-10 prose">
       <h1 className="text-3xl font-bold">Privacy Policy</h1>

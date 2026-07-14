@@ -4,7 +4,7 @@ import { BLOGS } from "@/lib/data";
 export const Route = createFileRoute("/blogs")({
   head: () => ({
     meta: [
-      { title: "Real Estate Blogs & Guides — Hive Estate" },
+      { title: "Real Estate Blogs & Guides — Hive Estate" }, { property: 'og:title', content: "Real Estate Blogs & Guides — Hive Estate" },
       {
         name: "description",
         content: "Property guides, market insights and home-buying tips for Belagavi.",

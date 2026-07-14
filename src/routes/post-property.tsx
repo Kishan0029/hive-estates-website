@@ -6,8 +6,8 @@ import { WhatsAppIcon } from "@/components/WhatsApp";
 export const Route = createFileRoute("/post-property")({
   head: () => ({
     meta: [
-      { title: "List Your Property Free — Hive Estate" },
-      { name: "description", content: "List your property free on Hive Estate. Reach genuine buyers in Belagavi." },
+      { title: "List Your Property Free — Hive Estate" }, { property: 'og:title', content: "List Your Property Free — Hive Estate" },
+      { name: "description", content: "List your property free on Hive Estate. Reach genuine buyers in Belagavi." }, { property: 'og:description', content: "List your property free on Hive Estate. Reach genuine buyers in Belagavi." },
     ],
   }),
   component: PostPropertyV2,

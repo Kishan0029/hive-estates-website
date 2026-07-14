@@ -6,8 +6,8 @@ import { WhatsAppIcon } from "@/components/WhatsApp";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact Hive Estate — Belagavi" },
-      { name: "description", content: "Get in touch with Hive Estate. Call, WhatsApp or send a message. We're here to help with buying property in Belagavi." },
+      { title: "Contact Hive Estate — Belagavi" }, { property: 'og:title', content: "Contact Hive Estate — Belagavi" },
+      { name: "description", content: "Get in touch with Hive Estate. Call, WhatsApp or send a message. We're here to help with buying property in Belagavi." }, { property: 'og:description', content: "Get in touch with Hive Estate. Call, WhatsApp or send a message. We're here to help with buying property in Belagavi." },
     ],
   }),
   component: Contact,

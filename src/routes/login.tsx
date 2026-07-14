@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
-    meta: [{ title: "Login — Hive Estate" }, { name: "robots", content: "noindex" }],
+    meta: [{ title: "Login — Hive Estate" }, { property: 'og:title', content: "Login — Hive Estate" }, { name: "robots", content: "noindex" }],
   }),
   component: Login,
 });

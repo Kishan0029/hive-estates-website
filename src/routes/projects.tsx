@@ -5,7 +5,7 @@ import { PropertyGrid } from "@/components/Section";
 export const Route = createFileRoute("/projects")({
   head: () => ({
     meta: [
-      { title: "New Projects in Belagavi — Hive Estate" },
+      { title: "New Projects in Belagavi — Hive Estate" }, { property: 'og:title', content: "New Projects in Belagavi — Hive Estate" },
       {
         name: "description",
         content: "Explore upcoming and newly launched residential projects in Belagavi.",

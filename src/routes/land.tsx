@@ -10,7 +10,7 @@ export const Route = createFileRoute("/land")({
   validateSearch: (s: Record<string, unknown>) => ({ q: typeof s.q === "string" ? s.q : "" }),
   head: () => ({
     meta: [
-      { title: "Land & Plots for Sale in Belagavi — Hive Estate" },
+      { title: "Land & Plots for Sale in Belagavi — Hive Estate" }, { property: 'og:title', content: "Land & Plots for Sale in Belagavi — Hive Estate" },
       {
         name: "description",
         content:
