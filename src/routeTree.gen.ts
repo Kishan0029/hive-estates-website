@@ -15,6 +15,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PostPropertyRouteImport } from './routes/post-property'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LandRouteImport } from './routes/land'
+import { Route as HiveVerifiedRouteImport } from './routes/hive-verified'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BuyRouteImport } from './routes/buy'
 import { Route as BuildersRouteImport } from './routes/builders'
@@ -53,6 +54,11 @@ const LoginRoute = LoginRouteImport.update({
 const LandRoute = LandRouteImport.update({
   id: '/land',
   path: '/land',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HiveVerifiedRoute = HiveVerifiedRouteImport.update({
+  id: '/hive-verified',
+  path: '/hive-verified',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -110,6 +116,7 @@ export interface FileRoutesByFullPath {
   '/builders': typeof BuildersRoute
   '/buy': typeof BuyRoute
   '/contact': typeof ContactRoute
+  '/hive-verified': typeof HiveVerifiedRoute
   '/land': typeof LandRoute
   '/login': typeof LoginRoute
   '/post-property': typeof PostPropertyRoute
@@ -127,6 +134,7 @@ export interface FileRoutesByTo {
   '/builders': typeof BuildersRoute
   '/buy': typeof BuyRoute
   '/contact': typeof ContactRoute
+  '/hive-verified': typeof HiveVerifiedRoute
   '/land': typeof LandRoute
   '/login': typeof LoginRoute
   '/post-property': typeof PostPropertyRoute
@@ -145,6 +153,7 @@ export interface FileRoutesById {
   '/builders': typeof BuildersRoute
   '/buy': typeof BuyRoute
   '/contact': typeof ContactRoute
+  '/hive-verified': typeof HiveVerifiedRoute
   '/land': typeof LandRoute
   '/login': typeof LoginRoute
   '/post-property': typeof PostPropertyRoute
@@ -164,6 +173,7 @@ export interface FileRouteTypes {
     | '/builders'
     | '/buy'
     | '/contact'
+    | '/hive-verified'
     | '/land'
     | '/login'
     | '/post-property'
@@ -181,6 +191,7 @@ export interface FileRouteTypes {
     | '/builders'
     | '/buy'
     | '/contact'
+    | '/hive-verified'
     | '/land'
     | '/login'
     | '/post-property'
@@ -198,6 +209,7 @@ export interface FileRouteTypes {
     | '/builders'
     | '/buy'
     | '/contact'
+    | '/hive-verified'
     | '/land'
     | '/login'
     | '/post-property'
@@ -216,6 +228,7 @@ export interface RootRouteChildren {
   BuildersRoute: typeof BuildersRoute
   BuyRoute: typeof BuyRoute
   ContactRoute: typeof ContactRoute
+  HiveVerifiedRoute: typeof HiveVerifiedRoute
   LandRoute: typeof LandRoute
   LoginRoute: typeof LoginRoute
   PostPropertyRoute: typeof PostPropertyRoute
@@ -267,6 +280,13 @@ declare module '@tanstack/react-router' {
       path: '/land'
       fullPath: '/land'
       preLoaderRoute: typeof LandRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hive-verified': {
+      id: '/hive-verified'
+      path: '/hive-verified'
+      fullPath: '/hive-verified'
+      preLoaderRoute: typeof HiveVerifiedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -344,6 +364,7 @@ const rootRouteChildren: RootRouteChildren = {
   BuildersRoute: BuildersRoute,
   BuyRoute: BuyRoute,
   ContactRoute: ContactRoute,
+  HiveVerifiedRoute: HiveVerifiedRoute,
   LandRoute: LandRoute,
   LoginRoute: LoginRoute,
   PostPropertyRoute: PostPropertyRoute,
@@ -355,3 +376,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

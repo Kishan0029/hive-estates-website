@@ -21,7 +21,10 @@ export function Section({
           {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}
         </div>
         {viewAll && (
-          <Link to={viewAll} className="text-sm font-semibold text-primary hover:text-accent whitespace-nowrap">
+          <Link
+            to={viewAll}
+            className="text-sm font-semibold text-primary hover:text-accent whitespace-nowrap"
+          >
             View all →
           </Link>
         )}
@@ -33,8 +36,10 @@ export function Section({
 
 export function PropertyGrid({ items }: { items: Property[] }) {
   return (
-    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {items.map((p) => <PropertyCard key={p.id} p={p} />)}
+    <div className="grid gap-6 sm:grid-cols-2">
+      {items.map((p) => (
+        <PropertyCard key={p.id} p={p} />
+      ))}
     </div>
   );
 }

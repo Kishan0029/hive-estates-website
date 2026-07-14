@@ -45,21 +45,21 @@
   --card-foreground: oklch(0.18 0.03 250);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.18 0.03 250);
-  --primary: oklch(0.28 0.09 258);          /* deep navy blue */
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.97 0.01 250);
-  --secondary-foreground: oklch(0.28 0.09 258);
+  --primary: #346022;          /* deep green from logo */
+  --primary-foreground: #ffffff;
+  --secondary: #edf2ea;        /* light green tint for secondary */
+  --secondary-foreground: #346022;
   --muted: oklch(0.96 0.008 250);
   --muted-foreground: oklch(0.48 0.02 250);
-  --accent: oklch(0.72 0.18 45);            /* orange */
-  --accent-foreground: oklch(0.99 0 0);
-  --success: oklch(0.66 0.15 155);          /* green */
-  --success-foreground: oklch(0.99 0 0);
+  --accent: #ffd200;           /* yellow from logo */
+  --accent-foreground: #346022;
+  --success: #346022;          /* align success with brand green */
+  --success-foreground: #ffffff;
   --destructive: oklch(0.58 0.22 27);
   --destructive-foreground: oklch(0.99 0 0);
-  --border: oklch(0.92 0.01 250);
-  --input: oklch(0.92 0.01 250);
-  --ring: oklch(0.72 0.18 45);
+  --border: #e2e8df;
+  --input: #e2e8df;
+  --ring: #ffd200;
 }
 
 @layer base {
@@ -78,4 +78,13 @@
   padding-inline: 1rem;
   @media (min-width: 768px) { padding-inline: 2rem; }
   @media (min-width: 1280px) { padding-inline: 3rem; }
+}
+
+/* Page transition */
+@keyframes pageFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+main > * {
+  animation: pageFadeIn 0.22s ease-out both;
 }

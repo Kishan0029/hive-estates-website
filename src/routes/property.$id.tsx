@@ -1,6 +1,15 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
-import { formatINR, getProperty, isVastuCompliant, PROPERTIES, telHref, waHrefFor, HIVE_PHONE_DISPLAY, type Property } from "@/lib/data";
+import {
+  formatINR,
+  getProperty,
+  isVastuCompliant,
+  PROPERTIES,
+  telHref,
+  waHrefFor,
+  HIVE_PHONE_DISPLAY,
+  type Property,
+} from "@/lib/data";
 import { PropertyGrid, Section } from "@/components/Section";
 import { HiveVerifiedBadge } from "@/components/PropertyCard";
 
@@ -29,7 +38,7 @@ function Detail() {
   const [emi, setEmi] = useState({ amount: p.price, rate: 8.5, years: 20 });
   const similar = PROPERTIES.filter((x) => x.id !== p.id && x.category === p.category).slice(0, 4);
   const monthly = calcEmi(emi.amount, emi.rate, emi.years);
-  const vastu = isVastuCompliant(p.facing);
+  const vastu = isVastuCompliant(p.facingDirection);
 
   return (
     <div className="container-p mx-auto max-w-7xl mt-6">
@@ -39,9 +48,19 @@ function Detail() {
           Listing #{p.id}
         </span>
         <HiveVerifiedBadge large />
-        {p.featured && <span className="rounded-md bg-accent text-accent-foreground text-xs font-bold px-3 py-1.5">FEATURED</span>}
-        {p.premium && <span className="rounded-md bg-primary text-primary-foreground text-xs font-bold px-3 py-1.5">PREMIUM</span>}
-        <span className="rounded-md bg-secondary text-secondary-foreground text-xs font-semibold px-3 py-1.5">{p.status}</span>
+        {p.featured && (
+          <span className="rounded-md bg-accent text-accent-foreground text-xs font-bold px-3 py-1.5">
+            FEATURED
+          </span>
+        )}
+        {p.premium && (
+          <span className="rounded-md bg-primary text-primary-foreground text-xs font-bold px-3 py-1.5">
+            PREMIUM
+          </span>
+        )}
+        <span className="rounded-md bg-secondary text-secondary-foreground text-xs font-semibold px-3 py-1.5">
+          {p.status}
+        </span>
       </div>
 
       {/* GALLERY */}
@@ -51,7 +70,11 @@ function Detail() {
         </div>
         <div className="grid grid-cols-4 md:grid-cols-2 gap-2">
           {p.gallery.map((g) => (
-            <button key={g} onClick={() => setMain(g)} className={`aspect-square overflow-hidden rounded-lg bg-muted border-2 ${main === g ? "border-primary" : "border-transparent"}`}>
+            <button
+              key={g}
+              onClick={() => setMain(g)}
+              className={`aspect-square overflow-hidden rounded-lg bg-muted border-2 ${main === g ? "border-primary" : "border-transparent"}`}
+            >
               <img src={g} alt="" className="h-full w-full object-cover" loading="lazy" />
             </button>
           ))}
@@ -61,11 +84,17 @@ function Detail() {
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_360px]">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold">{p.title}</h1>
-          <p className="text-muted-foreground mt-1">{p.locality}, {p.city} · {p.subType}</p>
+          <p className="text-muted-foreground mt-1">
+            {p.location} · {p.propertyType}
+          </p>
 
           <div className="mt-5 flex items-baseline gap-4">
-            <span className="font-display text-3xl font-bold text-primary">{formatINR(p.price)}</span>
-            {p.pricePerSqft && <span className="text-sm text-muted-foreground">₹{p.pricePerSqft}/sqft</span>}
+            <span className="font-display text-3xl font-bold text-primary">
+              {formatINR(p.price)}
+            </span>
+            {p.pricePerSqFt && (
+              <span className="text-sm text-muted-foreground">₹{p.pricePerSqFt}/sqft</span>
+            )}
           </div>
 
           {/* KEY SPECS */}
@@ -76,35 +105,34 @@ function Detail() {
                 ["Bedrooms", p.bhk ? `${p.bhk} BHK` : "—"],
                 ["Bathrooms", p.bathrooms ?? "—"],
                 ["Parking", p.parking ?? 0],
-                ["Facing", p.facing],
+                ["Facing", p.facingDirection ?? "—"],
                 ["Furnishing", p.furnishing ?? "—"],
                 ["Age", p.age ?? "—"],
-                ["Type", p.subType],
+                ["Type", p.propertyType],
               ].map(([k, v]) => (
                 <Spec key={k as string} k={k as string} v={v as string | number} />
               ))}
             </div>
           ) : (
             <div className="mt-6 grid grid-cols-2 md:grid-cols-3 gap-3">
-              {p.land && [
-                ["Property Type", p.subType],
-                ["NA Status", p.land.naStatus],
-                ["Plot Size", `${p.area} sqft`],
-                ["Facing", p.facing],
-                ["Approach Road Width", p.land.roadWidth],
-                ["Road Type", p.land.roadType],
-                ["Electricity", p.land.electricity ? "Available" : "Not Available"],
-                ["Drainage / Gutters", p.land.drainage ? "Available" : "Not Available"],
-                ["Water Connection", p.land.water ? "Available" : "Not Available"],
-                ["Ownership", p.land.ownership],
-                ["Survey Number", p.land.surveyNumber],
-                ["Boundary", p.land.boundary ? "Present" : "Not Present"],
-                ["Road Access", p.land.roadAccess ? "Yes" : "No"],
-                ["Nearby Landmark", p.land.landmark],
-                ["Price / sqft", p.pricePerSqft ? `₹ ${p.pricePerSqft}` : "—"],
-              ].map(([k, v]) => (
-                <Spec key={k as string} k={k as string} v={v as string} />
-              ))}
+              {p.land &&
+                [
+                  ["Property Type", p.propertyType],
+                  ["NA Status", p.land.naStatus],
+                  ["Plot Size", p.land.plotSize],
+                  ["Facing", p.land.facingDirection],
+                  ["Approach Road Width", p.land.roadWidth],
+                  ["Road Type", p.land.roadType],
+                  ["Electricity", p.land.electricity ? "Available" : "Not Available"],
+                  ["Drainage / Gutters", p.land.drainage ? "Available" : "Not Available"],
+                  ["Water Connection", p.land.waterConnection ? "Available" : "Not Available"],
+                  ["Ownership", p.land.ownershipType],
+                  ["Survey Number", p.land.surveyNumber],
+                  ["Boundary", p.land.boundary ? "Present" : "Not Present"],
+                  ["Road Access", p.land.roadAccess ? "Yes" : "No"],
+                  ["Nearby Landmark", p.land.nearbyLandmarks],
+                  ["Price / sqft", p.pricePerSqFt ? `₹ ${p.pricePerSqFt}` : "—"],
+                ].map(([k, v]) => <Spec key={k as string} k={k as string} v={v as string} />)}
             </div>
           )}
 
@@ -133,7 +161,12 @@ function Detail() {
               <h2 className="text-lg font-bold mb-3">Amenities</h2>
               <div className="flex flex-wrap gap-2">
                 {p.amenities.map((a) => (
-                  <span key={a} className="rounded-full border border-border bg-card px-3 py-1.5 text-sm">✓ {a}</span>
+                  <span
+                    key={a}
+                    className="rounded-full border border-border bg-card px-3 py-1.5 text-sm"
+                  >
+                    ✓ {a}
+                  </span>
                 ))}
               </div>
             </section>
@@ -143,7 +176,7 @@ function Detail() {
           <section className="mt-8">
             <h2 className="text-lg font-bold mb-3">Location on Map</h2>
             <div className="aspect-[16/8] rounded-xl border border-border bg-secondary grid place-items-center text-muted-foreground text-sm">
-              📍 Google Map — {p.locality}, {p.city}
+              📍 Google Map — {p.latitude}, {p.longitude}
             </div>
           </section>
 
@@ -170,13 +203,35 @@ function Detail() {
             <section className="mt-8 rounded-xl border border-border bg-card p-6">
               <h2 className="text-lg font-bold">EMI Calculator</h2>
               <div className="mt-4 grid gap-4 md:grid-cols-3">
-                <Slider label={`Loan Amount: ${formatINR(emi.amount)}`} min={500000} max={p.price * 1.2} value={emi.amount} onChange={(v) => setEmi({ ...emi, amount: v })} step={100000} />
-                <Slider label={`Interest: ${emi.rate}%`} min={6} max={12} step={0.1} value={emi.rate} onChange={(v) => setEmi({ ...emi, rate: v })} />
-                <Slider label={`Tenure: ${emi.years} yrs`} min={5} max={30} value={emi.years} onChange={(v) => setEmi({ ...emi, years: v })} />
+                <Slider
+                  label={`Loan Amount: ${formatINR(emi.amount)}`}
+                  min={500000}
+                  max={p.price * 1.2}
+                  value={emi.amount}
+                  onChange={(v) => setEmi({ ...emi, amount: v })}
+                  step={100000}
+                />
+                <Slider
+                  label={`Interest: ${emi.rate}%`}
+                  min={6}
+                  max={12}
+                  step={0.1}
+                  value={emi.rate}
+                  onChange={(v) => setEmi({ ...emi, rate: v })}
+                />
+                <Slider
+                  label={`Tenure: ${emi.years} yrs`}
+                  min={5}
+                  max={30}
+                  value={emi.years}
+                  onChange={(v) => setEmi({ ...emi, years: v })}
+                />
               </div>
               <div className="mt-4 flex items-baseline gap-3">
                 <span className="text-sm text-muted-foreground">Monthly EMI:</span>
-                <span className="font-display text-2xl font-bold text-primary">₹ {monthly.toLocaleString("en-IN")}</span>
+                <span className="font-display text-2xl font-bold text-primary">
+                  ₹ {monthly.toLocaleString("en-IN")}
+                </span>
               </div>
             </section>
           )}
@@ -187,12 +242,30 @@ function Detail() {
           <div>
             <div className="text-sm text-muted-foreground">Listing</div>
             <div className="font-display font-bold text-primary text-lg">#{p.id}</div>
-            <div className="text-xs text-muted-foreground mt-2">Posted by <span className="font-semibold text-foreground">{p.postedBy}</span> · {p.postedDate}</div>
+            <div className="text-xs text-muted-foreground mt-2">
+              Posted by <span className="font-semibold text-foreground">{p.postedBy}</span> ·{" "}
+              {p.postedDate}
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-2">
-            <a href={telHref} className="inline-flex items-center justify-center gap-1.5 rounded-md bg-primary text-primary-foreground py-2.5 text-sm font-semibold hover:opacity-90">
-              📞 Call
+            <a
+              href={telHref}
+              className="inline-flex items-center justify-center gap-1.5 rounded-md bg-accent text-accent-foreground py-2.5 text-sm font-bold hover:opacity-90"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13 1.05.37 2.07.72 3.06a2 2 0 0 1-.45 2.11L8.09 10.91a16 16 0 0 0 6 6l2.02-1.29a2 2 0 0 1 2.11-.45c.99.35 2.01.59 3.06.72A2 2 0 0 1 22 16.92z" />
+              </svg>{" "}
+              Call
             </a>
             <a
               href={waHrefFor(p)}
@@ -200,19 +273,54 @@ function Detail() {
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-1.5 rounded-md bg-success text-success-foreground py-2.5 text-sm font-semibold hover:opacity-90"
             >
-              💬 WhatsApp
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+              </svg>{" "}
+              WhatsApp
             </a>
           </div>
           <p className="text-xs text-muted-foreground text-center">{HIVE_PHONE_DISPLAY}</p>
 
-          <form className="space-y-3 pt-3 border-t border-border" onSubmit={(e) => e.preventDefault()}>
-            <input placeholder="Your Name" className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm" />
-            <input placeholder="Phone Number" className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm" />
-            <input placeholder="Email" className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm" />
-            <textarea rows={3} placeholder={`I'm interested in listing #${p.id}...`} className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm" />
-            <button className="w-full rounded-md bg-primary py-2.5 text-sm font-semibold text-primary-foreground">Send Enquiry</button>
+          <form
+            className="space-y-3 pt-3 border-t border-border"
+            onSubmit={(e) => e.preventDefault()}
+          >
+            <input
+              placeholder="Your Name"
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+            />
+            <input
+              placeholder="Phone Number"
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+            />
+            <input
+              placeholder="Email"
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+            />
+            <textarea
+              rows={3}
+              placeholder={`I'm interested in listing #${p.id}...`}
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+            />
+            <button className="w-full rounded-md bg-accent py-2.5 text-sm font-bold text-accent-foreground">
+              Send Enquiry
+            </button>
           </form>
-          <Link to="/contact" className="block text-center text-xs text-primary font-semibold hover:underline">Schedule a site visit →</Link>
+          <Link
+            to="/contact"
+            className="block text-center text-xs text-primary font-semibold hover:underline"
+          >
+            Schedule a site visit →
+          </Link>
         </aside>
       </div>
 
@@ -232,11 +340,33 @@ function Spec({ k, v }: { k: string; v: string | number }) {
   );
 }
 
-function Slider({ label, min, max, value, onChange, step = 1 }: { label: string; min: number; max: number; value: number; onChange: (v: number) => void; step?: number }) {
+function Slider({
+  label,
+  min,
+  max,
+  value,
+  onChange,
+  step = 1,
+}: {
+  label: string;
+  min: number;
+  max: number;
+  value: number;
+  onChange: (v: number) => void;
+  step?: number;
+}) {
   return (
     <label className="block">
       <div className="text-xs font-semibold text-muted-foreground mb-1">{label}</div>
-      <input type="range" min={min} max={max} step={step} value={value} onChange={(e) => onChange(Number(e.target.value))} className="w-full accent-primary" />
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="w-full accent-primary"
+      />
     </label>
   );
 }
