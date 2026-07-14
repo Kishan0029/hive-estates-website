@@ -12,12 +12,12 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background">
-      <div className="container-p mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 relative">
+      <div className="container-p mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 relative">
         <Link to="/" className="flex items-center shrink-0 z-10">
           <img
             src="/Hive Logo.png"
             alt="Hive Estates"
-            className="h-14 w-auto object-contain"
+            className="h-[4.5rem] sm:h-20 w-auto object-contain scale-[1.15] origin-left"
           />
         </Link>
 
