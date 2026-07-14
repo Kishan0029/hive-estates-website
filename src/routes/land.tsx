@@ -1,16 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ListingsPage } from "@/components/ListingsPage";
 
-export const Route = createFileRoute("/buy")({
+export const Route = createFileRoute("/land")({
   validateSearch: (s: Record<string, unknown>) => ({ q: typeof s.q === "string" ? s.q : "" }),
   head: () => ({
     meta: [
-      { title: "Properties for Sale in Belagavi — Hive Estate" },
-      { name: "description", content: "Browse Hive Verified land, apartments and bungalows for sale in Belagavi." },
+      { title: "Land & Plots for Sale in Belagavi — Hive Estate" },
+      { name: "description", content: "NA and Non-NA plots for sale across Tilakwadi, Vadgaon, Shahapur, Machhe, Kanbargi and more." },
     ],
   }),
   component: () => {
     const { q } = Route.useSearch();
-    return <ListingsPage mode="buy" initialQuery={q} />;
+    return <ListingsPage mode="land" initialQuery={q} />;
   },
 });

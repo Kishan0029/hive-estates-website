@@ -10,17 +10,16 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
-import { Route as RentRouteImport } from './routes/rent'
 import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PostPropertyRouteImport } from './routes/post-property'
-import { Route as PlotsRouteImport } from './routes/plots'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as LandRouteImport } from './routes/land'
 import { Route as ContactRouteImport } from './routes/contact'
-import { Route as CommercialRouteImport } from './routes/commercial'
 import { Route as BuyRouteImport } from './routes/buy'
 import { Route as BuildersRouteImport } from './routes/builders'
 import { Route as BlogsRouteImport } from './routes/blogs'
+import { Route as ApartmentsRouteImport } from './routes/apartments'
 import { Route as AgentsRouteImport } from './routes/agents'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -29,11 +28,6 @@ import { Route as PropertyIdRouteImport } from './routes/property.$id'
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RentRoute = RentRouteImport.update({
-  id: '/rent',
-  path: '/rent',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProjectsRoute = ProjectsRouteImport.update({
@@ -51,24 +45,19 @@ const PostPropertyRoute = PostPropertyRouteImport.update({
   path: '/post-property',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PlotsRoute = PlotsRouteImport.update({
-  id: '/plots',
-  path: '/plots',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LandRoute = LandRouteImport.update({
+  id: '/land',
+  path: '/land',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CommercialRoute = CommercialRouteImport.update({
-  id: '/commercial',
-  path: '/commercial',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BuyRoute = BuyRouteImport.update({
@@ -84,6 +73,11 @@ const BuildersRoute = BuildersRouteImport.update({
 const BlogsRoute = BlogsRouteImport.update({
   id: '/blogs',
   path: '/blogs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApartmentsRoute = ApartmentsRouteImport.update({
+  id: '/apartments',
+  path: '/apartments',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AgentsRoute = AgentsRouteImport.update({
@@ -111,17 +105,16 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/agents': typeof AgentsRoute
+  '/apartments': typeof ApartmentsRoute
   '/blogs': typeof BlogsRoute
   '/builders': typeof BuildersRoute
   '/buy': typeof BuyRoute
-  '/commercial': typeof CommercialRoute
   '/contact': typeof ContactRoute
+  '/land': typeof LandRoute
   '/login': typeof LoginRoute
-  '/plots': typeof PlotsRoute
   '/post-property': typeof PostPropertyRoute
   '/privacy': typeof PrivacyRoute
   '/projects': typeof ProjectsRoute
-  '/rent': typeof RentRoute
   '/terms': typeof TermsRoute
   '/property/$id': typeof PropertyIdRoute
 }
@@ -129,17 +122,16 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/agents': typeof AgentsRoute
+  '/apartments': typeof ApartmentsRoute
   '/blogs': typeof BlogsRoute
   '/builders': typeof BuildersRoute
   '/buy': typeof BuyRoute
-  '/commercial': typeof CommercialRoute
   '/contact': typeof ContactRoute
+  '/land': typeof LandRoute
   '/login': typeof LoginRoute
-  '/plots': typeof PlotsRoute
   '/post-property': typeof PostPropertyRoute
   '/privacy': typeof PrivacyRoute
   '/projects': typeof ProjectsRoute
-  '/rent': typeof RentRoute
   '/terms': typeof TermsRoute
   '/property/$id': typeof PropertyIdRoute
 }
@@ -148,17 +140,16 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/agents': typeof AgentsRoute
+  '/apartments': typeof ApartmentsRoute
   '/blogs': typeof BlogsRoute
   '/builders': typeof BuildersRoute
   '/buy': typeof BuyRoute
-  '/commercial': typeof CommercialRoute
   '/contact': typeof ContactRoute
+  '/land': typeof LandRoute
   '/login': typeof LoginRoute
-  '/plots': typeof PlotsRoute
   '/post-property': typeof PostPropertyRoute
   '/privacy': typeof PrivacyRoute
   '/projects': typeof ProjectsRoute
-  '/rent': typeof RentRoute
   '/terms': typeof TermsRoute
   '/property/$id': typeof PropertyIdRoute
 }
@@ -168,17 +159,16 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/agents'
+    | '/apartments'
     | '/blogs'
     | '/builders'
     | '/buy'
-    | '/commercial'
     | '/contact'
+    | '/land'
     | '/login'
-    | '/plots'
     | '/post-property'
     | '/privacy'
     | '/projects'
-    | '/rent'
     | '/terms'
     | '/property/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -186,17 +176,16 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/agents'
+    | '/apartments'
     | '/blogs'
     | '/builders'
     | '/buy'
-    | '/commercial'
     | '/contact'
+    | '/land'
     | '/login'
-    | '/plots'
     | '/post-property'
     | '/privacy'
     | '/projects'
-    | '/rent'
     | '/terms'
     | '/property/$id'
   id:
@@ -204,17 +193,16 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/agents'
+    | '/apartments'
     | '/blogs'
     | '/builders'
     | '/buy'
-    | '/commercial'
     | '/contact'
+    | '/land'
     | '/login'
-    | '/plots'
     | '/post-property'
     | '/privacy'
     | '/projects'
-    | '/rent'
     | '/terms'
     | '/property/$id'
   fileRoutesById: FileRoutesById
@@ -223,17 +211,16 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AgentsRoute: typeof AgentsRoute
+  ApartmentsRoute: typeof ApartmentsRoute
   BlogsRoute: typeof BlogsRoute
   BuildersRoute: typeof BuildersRoute
   BuyRoute: typeof BuyRoute
-  CommercialRoute: typeof CommercialRoute
   ContactRoute: typeof ContactRoute
+  LandRoute: typeof LandRoute
   LoginRoute: typeof LoginRoute
-  PlotsRoute: typeof PlotsRoute
   PostPropertyRoute: typeof PostPropertyRoute
   PrivacyRoute: typeof PrivacyRoute
   ProjectsRoute: typeof ProjectsRoute
-  RentRoute: typeof RentRoute
   TermsRoute: typeof TermsRoute
   PropertyIdRoute: typeof PropertyIdRoute
 }
@@ -245,13 +232,6 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/rent': {
-      id: '/rent'
-      path: '/rent'
-      fullPath: '/rent'
-      preLoaderRoute: typeof RentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/projects': {
@@ -275,13 +255,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PostPropertyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/plots': {
-      id: '/plots'
-      path: '/plots'
-      fullPath: '/plots'
-      preLoaderRoute: typeof PlotsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -289,18 +262,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/land': {
+      id: '/land'
+      path: '/land'
+      fullPath: '/land'
+      preLoaderRoute: typeof LandRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contact': {
       id: '/contact'
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/commercial': {
-      id: '/commercial'
-      path: '/commercial'
-      fullPath: '/commercial'
-      preLoaderRoute: typeof CommercialRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/buy': {
@@ -322,6 +295,13 @@ declare module '@tanstack/react-router' {
       path: '/blogs'
       fullPath: '/blogs'
       preLoaderRoute: typeof BlogsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/apartments': {
+      id: '/apartments'
+      path: '/apartments'
+      fullPath: '/apartments'
+      preLoaderRoute: typeof ApartmentsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/agents': {
@@ -359,17 +339,16 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AgentsRoute: AgentsRoute,
+  ApartmentsRoute: ApartmentsRoute,
   BlogsRoute: BlogsRoute,
   BuildersRoute: BuildersRoute,
   BuyRoute: BuyRoute,
-  CommercialRoute: CommercialRoute,
   ContactRoute: ContactRoute,
+  LandRoute: LandRoute,
   LoginRoute: LoginRoute,
-  PlotsRoute: PlotsRoute,
   PostPropertyRoute: PostPropertyRoute,
   PrivacyRoute: PrivacyRoute,
   ProjectsRoute: ProjectsRoute,
-  RentRoute: RentRoute,
   TermsRoute: TermsRoute,
   PropertyIdRoute: PropertyIdRoute,
 }

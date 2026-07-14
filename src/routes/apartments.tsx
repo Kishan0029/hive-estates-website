@@ -1,16 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ListingsPage } from "@/components/ListingsPage";
 
-export const Route = createFileRoute("/buy")({
+export const Route = createFileRoute("/apartments")({
   validateSearch: (s: Record<string, unknown>) => ({ q: typeof s.q === "string" ? s.q : "" }),
   head: () => ({
     meta: [
-      { title: "Properties for Sale in Belagavi — Hive Estate" },
-      { name: "description", content: "Browse Hive Verified land, apartments and bungalows for sale in Belagavi." },
+      { title: "Apartments & Bungalows in Belagavi — Hive Estate" },
+      { name: "description", content: "Verified apartments and bungalows for sale in Belagavi's top localities." },
     ],
   }),
   component: () => {
     const { q } = Route.useSearch();
-    return <ListingsPage mode="buy" initialQuery={q} />;
+    return <ListingsPage mode="apartments" initialQuery={q} />;
   },
 });
