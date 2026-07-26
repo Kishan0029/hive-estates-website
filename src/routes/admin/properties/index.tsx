@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { getAdminPropertiesFn } from "@/lib/server/properties";
+import { getAdminPropertiesFn } from "@/server-fns/properties";
 import { useState } from "react";
 // Remove Lucide icons if not already installed, I'll use inline SVGs for stability
 

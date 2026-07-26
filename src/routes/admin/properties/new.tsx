@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { getUploadUrlFn, createPropertyFn } from "@/lib/server/properties";
+import { getUploadUrlFn, createPropertyFn } from "@/server-fns/properties";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
