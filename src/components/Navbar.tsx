@@ -39,6 +39,12 @@ export function Navbar() {
           <div className="hidden sm:block">
             <GoogleTranslate />
           </div>
+          <Link 
+            to="/post-property" 
+            className="hidden sm:inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2"
+          >
+            List Property
+          </Link>
           <button
             aria-label="Menu"
             className="lg:hidden p-2 rounded-md hover:bg-secondary text-foreground"
