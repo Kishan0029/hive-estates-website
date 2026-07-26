@@ -14,7 +14,6 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { FloatingWhatsApp } from "@/components/WhatsApp";
-import { motion, AnimatePresence } from "framer-motion";
 
 function NotFoundComponent() {
   return (
@@ -146,20 +145,9 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <div className="flex min-h-screen flex-col">
         <Navbar />
-        <div className="flex-1 relative flex flex-col">
-          <AnimatePresence>
-            <motion.main
-              key={pathname}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0, position: "absolute", inset: 0 }}
-              transition={{ duration: 0.5, ease: "easeInOut" }}
-              className={`flex-1 flex flex-col bg-background ${pathname.startsWith('/admin') ? 'notranslate' : ''}`}
-            >
-              <Outlet />
-            </motion.main>
-          </AnimatePresence>
-        </div>
+        <main className={`flex-1 flex flex-col ${pathname.startsWith('/admin') ? 'notranslate' : ''}`}>
+          <Outlet />
+        </main>
         <Footer />
         <FloatingWhatsApp />
       </div>
