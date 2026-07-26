@@ -1,45 +1,65 @@
 // Hive Estate — Buy-only data (Land + Apartments / Bungalows)
 
 export type Category = "land" | "home";
-export type Facing =
-  | "East" | "West" | "North" | "North East" | "North West" | "South East" | "South";
+export type FacingDirection =
+  "East" | "West" | "North" | "North East" | "North West" | "South East" | "South" | "South West";
 
 export type LandDetails = {
   naStatus: "NA" | "Non-NA";
-  roadWidth: string;           // e.g. "20 ft"
-  roadType: "Asphalt" | "Concrete" | "Mud Road";
-  electricity: boolean;
-  drainage: boolean;
-  water: boolean;
+  plotSize: string;
   surveyNumber: string;
-  ownership: "Agricultural" | "Residential" | "Converted";
-  landmark: string;
-  boundary: boolean;
-  roadAccess: boolean;
+  roadWidth: string; // e.g. "20 ft"
+  roadType?: "Asphalt" | "Concrete" | "Mud Road";
+  electricity: boolean;
+  waterConnection: boolean;
+  drainage: boolean;
+  facingDirection: FacingDirection;
+  googleMap: string;
+  nearbyLandmarks: string;
+  vastuCompliance: boolean;
+  approvals?: string;
+  ownershipType?: string;
 };
 
 export type Property = {
-  id: string;                   // Listing number, e.g. "L0101"
-  category: Category;
-  subType: "Apartment" | "Bungalow" | "NA Plot" | "Non-NA Plot";
+  id: string; // UUID or same as listingNumber
+  listingNumber: string; // e.g. "L0101"
   title: string;
-  price: number;                // INR
-  pricePerSqft?: number;
-  area: number;                 // sqft
+  slug: string;
+  propertyType: "Apartment" | "Bungalow" | "NA Plot" | "Non-NA Plot";
+  category: Category;
+  price: number; // INR
+  pricePerSqFt?: number;
+  location: string;
+  addressLine?: string; // Optional exact address
+  area: number; // sqft
+  description: string;
+  gallery: string[];
+  latitude: number;
+  longitude: number;
+  contactNumber: string;
+  whatsappNumber: string;
+  verified: boolean;
+  featured: boolean;
+  metadata?: Record<string, any>;
+  approvedBanks?: string; // e.g. "SBI, HDFC"
+  dimensions?: string;
+  layoutName?: string;
+  priceOnRequest?: boolean;
+  createdAt: string;
+  updatedAt: string;
+
+  // Legacy/UI specific fields for backward compatibility
   locality: string;
   city: string;
   status: "Ready to Move" | "Under Construction" | "New Launch" | "Available";
-  facing: Facing;
-  image: string;
-  gallery: string[];
-  description: string;
   amenities: string[];
   tags: string[];
-  featured?: boolean;
   premium?: boolean;
   postedBy: "Owner" | "Agent" | "Builder";
   postedDate: string;
   hiveVerified: boolean;
+
   // home fields
   bhk?: number;
   bathrooms?: number;
@@ -47,8 +67,15 @@ export type Property = {
   furnishing?: "Furnished" | "Semi-Furnished" | "Unfurnished";
   age?: string;
   builder?: string;
+  facingDirection?: FacingDirection;
+  vastuCompliance?: boolean;
+
   // land fields
   land?: LandDetails;
+
+  // To satisfy old 'facing' and 'image' usages
+  facing?: FacingDirection;
+  image?: string;
 };
 
 // ---------- Contact (easily configurable) ----------
@@ -59,34 +86,48 @@ const TEL_NUMBER = "+919000000000";
 export const telHref = `tel:${TEL_NUMBER}`;
 
 export const waHrefFor = (p: Property) => {
-  const type = p.category === "land" ? "land" : "property";
-  const msg = `Hello, I would like to enquire about the ${type} with Listing Number ${p.id}. Please share more details, location, price, availability and site visit timings.`;
-  return `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
+  if (p.category === "land") {
+    const msg = `Hello, I would like to enquire about the land "${p.title}" with Listing Number ${p.listingNumber}. Please share more details, price, exact location, availability and site visit timings.`;
+    return `https://wa.me/${p.whatsappNumber || WA_NUMBER}?text=${encodeURIComponent(msg)}`;
+  } else {
+    const msg = `Hello, I would like to enquire about the property "${p.title}" with Listing Number ${p.listingNumber}. Please share more details, price, availability and site visit timings.`;
+    return `https://wa.me/${p.whatsappNumber || WA_NUMBER}?text=${encodeURIComponent(msg)}`;
+  }
 };
 
 // ---------- Localities & nearby ----------
 export const LOCALITIES = [
-  "Tilakwadi", "Vadgaon", "Shahapur", "Machhe", "Kanbargi",
-  "Kakati", "Rukmini Nagar", "Camp", "Hanuman Nagar", "Sadashiv Nagar",
-  "Angol", "Mahantesh Nagar", "Nehru Nagar", "Khasbag", "Hindalga",
+  "Tilakwadi",
+  "Vadgaon",
+  "Shahapur",
+  "Machhe",
+  "Kanbargi",
+  "Camp",
+  "Hanuman Nagar",
+  "Kakati",
+  "Angol",
+  "Mahantesh Nagar",
+  "Rukmini Nagar",
+  "Sadashiv Nagar",
+  "RPD",
+  "Bhagya Nagar",
 ] as const;
 
 export const NEARBY: Record<string, string[]> = {
-  Tilakwadi: ["Camp", "Shahapur", "Khasbag"],
-  Shahapur: ["Tilakwadi", "Vadgaon", "Khasbag"],
-  Vadgaon: ["Shahapur", "Hindalga", "Machhe"],
-  Machhe: ["Vadgaon", "Kakati", "Kanbargi"],
-  Kanbargi: ["Rukmini Nagar", "Nehru Nagar", "Machhe"],
-  Kakati: ["Machhe", "Hindalga", "Vadgaon"],
-  "Rukmini Nagar": ["Kanbargi", "Mahantesh Nagar", "Nehru Nagar"],
-  Camp: ["Tilakwadi", "Khasbag", "Shahapur"],
+  Tilakwadi: ["Camp", "Shahapur", "Angol", "RPD", "Bhagya Nagar"],
+  Shahapur: ["Tilakwadi", "Vadgaon", "Angol"],
+  Vadgaon: ["Shahapur", "Machhe", "Angol"],
+  Machhe: ["Vadgaon", "Kakati"],
+  Kanbargi: ["Rukmini Nagar", "Mahantesh Nagar"],
+  Kakati: ["Machhe"],
+  "Rukmini Nagar": ["Kanbargi", "Mahantesh Nagar", "Sadashiv Nagar"],
+  Camp: ["Tilakwadi", "Shahapur"],
   "Hanuman Nagar": ["Sadashiv Nagar", "Angol", "Mahantesh Nagar"],
-  "Sadashiv Nagar": ["Hanuman Nagar", "Angol", "Nehru Nagar"],
-  Angol: ["Sadashiv Nagar", "Hanuman Nagar", "Mahantesh Nagar"],
-  "Mahantesh Nagar": ["Angol", "Rukmini Nagar", "Hanuman Nagar"],
-  "Nehru Nagar": ["Kanbargi", "Sadashiv Nagar", "Rukmini Nagar"],
-  Khasbag: ["Tilakwadi", "Camp", "Shahapur"],
-  Hindalga: ["Vadgaon", "Kakati", "Machhe"],
+  "Sadashiv Nagar": ["Hanuman Nagar", "Rukmini Nagar"],
+  Angol: ["Sadashiv Nagar", "Hanuman Nagar", "Tilakwadi", "Shahapur", "Bhagya Nagar"],
+  "Mahantesh Nagar": ["Rukmini Nagar", "Hanuman Nagar", "Kanbargi"],
+  "RPD": ["Tilakwadi", "Bhagya Nagar"],
+  "Bhagya Nagar": ["Tilakwadi", "Angol", "RPD"],
 };
 
 // ---------- Images ----------
@@ -117,128 +158,295 @@ const LAND_IMGS = [
   "photo-1533587851505-d119e13fa0d7",
 ];
 
-const AMENITIES = ["Lift", "Power Backup", "Security", "Gym", "Swimming Pool", "Club House", "Kids Play Area", "Garden", "CCTV", "Parking"];
-const BUILDERS = ["Hive Developers", "Belgaum Constructions", "Sahyadri Homes", "Green Vista Group", "Prestige North"];
+const AMENITIES = [
+  "Lift",
+  "Power Backup",
+  "Security",
+  "Gym",
+  "Swimming Pool",
+  "Club House",
+  "Kids Play Area",
+  "Garden",
+  "CCTV",
+  "Parking",
+];
+const BUILDERS = [
+  "Hive Developers",
+  "Belgaum Constructions",
+  "Sahyadri Homes",
+  "Green Vista Group",
+  "Prestige North",
+];
 
 // ---------- Facing rotation (never randomly assign South) ----------
-const SAFE_FACING: Facing[] = ["East", "West", "North", "North East", "North West", "South East"];
+const SAFE_FACING: FacingDirection[] = [
+  "East",
+  "West",
+  "North",
+  "North East",
+  "North West",
+  "South East",
+];
 
 // ---------- Seed ----------
-type HomeSeed = { subType: "Apartment" | "Bungalow"; bhk: number; area: number; price: number; locality: string; premium?: boolean; featured?: boolean };
-type LandSeed = { naStatus: "NA" | "Non-NA"; area: number; price: number; locality: string; ownership: LandDetails["ownership"]; featured?: boolean; forceSouth?: boolean };
+type HomeSeed = {
+  subType: "Apartment" | "Bungalow";
+  bhk: number;
+  area: number;
+  price: number;
+  locality: string;
+  premium?: boolean;
+  featured?: boolean;
+};
+type LandSeed = {
+  naStatus: "NA" | "Non-NA";
+  area: number;
+  price: number;
+  locality: string;
+  featured?: boolean;
+  forceSouth?: boolean;
+};
 
 const HOMES: HomeSeed[] = [
-  { subType: "Apartment", bhk: 3, area: 1450, price: 8500000,  locality: "Tilakwadi",       featured: true },
-  { subType: "Bungalow",  bhk: 4, area: 2800, price: 21500000, locality: "Sadashiv Nagar",  premium: true, featured: true },
-  { subType: "Apartment", bhk: 2, area: 1100, price: 5200000,  locality: "Shahapur" },
-  { subType: "Apartment", bhk: 3, area: 1600, price: 9800000,  locality: "Vadgaon",         premium: true },
-  { subType: "Apartment", bhk: 1, area: 620,  price: 3200000,  locality: "Camp" },
-  { subType: "Bungalow",  bhk: 4, area: 3200, price: 28500000, locality: "Hanuman Nagar",   featured: true },
-  { subType: "Apartment", bhk: 2, area: 1200, price: 6100000,  locality: "Nehru Nagar" },
-  { subType: "Apartment", bhk: 3, area: 1550, price: 8900000,  locality: "Angol" },
-  { subType: "Bungalow",  bhk: 3, area: 2100, price: 14500000, locality: "Rukmini Nagar" },
-  { subType: "Apartment", bhk: 2, area: 1180, price: 5800000,  locality: "Mahantesh Nagar" },
+  {
+    subType: "Apartment",
+    bhk: 3,
+    area: 1450,
+    price: 8500000,
+    locality: "Tilakwadi",
+    featured: true,
+  },
+  {
+    subType: "Bungalow",
+    bhk: 4,
+    area: 2800,
+    price: 21500000,
+    locality: "Sadashiv Nagar",
+    premium: true,
+    featured: true,
+  },
+  { subType: "Apartment", bhk: 2, area: 1100, price: 5200000, locality: "Shahapur" },
+  { subType: "Apartment", bhk: 3, area: 1600, price: 9800000, locality: "Vadgaon", premium: true },
+  { subType: "Apartment", bhk: 1, area: 620, price: 3200000, locality: "Camp" },
+  {
+    subType: "Bungalow",
+    bhk: 4,
+    area: 3200,
+    price: 28500000,
+    locality: "Hanuman Nagar",
+    featured: true,
+  },
+  { subType: "Apartment", bhk: 3, area: 1550, price: 8900000, locality: "Angol" },
+  { subType: "Bungalow", bhk: 3, area: 2100, price: 14500000, locality: "Rukmini Nagar" },
+  { subType: "Apartment", bhk: 2, area: 1180, price: 5800000, locality: "Mahantesh Nagar" },
 ];
 
-const LANDS: LandSeed[] = [
-  { naStatus: "NA",     area: 2400, price: 3600000,  locality: "Tilakwadi",     ownership: "Converted",     featured: true },
-  { naStatus: "NA",     area: 3600, price: 5400000,  locality: "Vadgaon",       ownership: "Residential",   featured: true },
-  { naStatus: "Non-NA", area: 8000, price: 4200000,  locality: "Kakati",        ownership: "Agricultural" },
-  { naStatus: "NA",     area: 1800, price: 2700000,  locality: "Shahapur",      ownership: "Converted" },
-  { naStatus: "NA",     area: 2200, price: 3100000,  locality: "Machhe",        ownership: "Residential" },
-  { naStatus: "Non-NA", area: 12000, price: 6500000, locality: "Marihal" as unknown as string, ownership: "Agricultural" },
-  { naStatus: "NA",     area: 3000, price: 4800000,  locality: "Kanbargi",      ownership: "Residential",   featured: true },
-  { naStatus: "NA",     area: 2000, price: 2900000,  locality: "Rukmini Nagar", ownership: "Converted" },
-  { naStatus: "Non-NA", area: 9500, price: 5100000,  locality: "Hindalga",      ownership: "Agricultural" },
-  { naStatus: "NA",     area: 2700, price: 4100000,  locality: "Hanuman Nagar", ownership: "Residential",   forceSouth: true },
-  { naStatus: "NA",     area: 3200, price: 5600000,  locality: "Sadashiv Nagar", ownership: "Converted" },
-  { naStatus: "Non-NA", area: 6000, price: 3800000,  locality: "Kakati",        ownership: "Agricultural" },
-];
+
 
 const listingNo = (i: number) => `L${String(101 + i).padStart(4, "0")}`;
-
 const ROAD_TYPES: LandDetails["roadType"][] = ["Asphalt", "Concrete", "Mud Road"];
 const ROAD_WIDTHS = ["15 ft", "20 ft", "30 ft", "40 ft", "60 ft"];
+
+export const isVastuCompliant = (facing: FacingDirection | undefined) => facing !== "South";
 
 let cursor = 0;
 const homeProps: Property[] = HOMES.map((h, i) => {
   const id = listingNo(cursor++);
-  const gallery = [HOME_IMGS[i % HOME_IMGS.length], HOME_IMGS[(i + 3) % HOME_IMGS.length], HOME_IMGS[(i + 6) % HOME_IMGS.length], HOME_IMGS[(i + 1) % HOME_IMGS.length]].map((x) => img(x));
-  const facing = SAFE_FACING[i % SAFE_FACING.length];
+  const gallery = [
+    HOME_IMGS[i % HOME_IMGS.length],
+    HOME_IMGS[(i + 3) % HOME_IMGS.length],
+    HOME_IMGS[(i + 6) % HOME_IMGS.length],
+    HOME_IMGS[(i + 1) % HOME_IMGS.length],
+  ].map((x) => img(x));
+  const facingDirection = SAFE_FACING[i % SAFE_FACING.length];
+
   return {
     id,
-    category: "home",
-    subType: h.subType,
+    listingNumber: id,
     title: `${h.bhk} BHK ${h.subType} in ${h.locality}`,
+    slug: `${h.bhk}-bhk-${h.subType.toLowerCase()}-${h.locality.toLowerCase()}`,
+    propertyType: h.subType,
+    category: "home",
     price: h.price,
-    pricePerSqft: Math.round(h.price / h.area),
-    area: h.area,
+    pricePerSqFt: Math.round(h.price / h.area),
+    location: `${h.locality}, Belagavi, Karnataka`,
     locality: h.locality,
     city: "Belagavi",
-    status: (["Ready to Move", "Under Construction", "New Launch"] as const)[i % 3],
-    facing,
-    image: gallery[0],
-    gallery,
+    area: h.area,
     description: `A well-designed ${h.subType.toLowerCase()} located in the prime area of ${h.locality}, Belagavi. Excellent connectivity, quality construction, and access to schools, hospitals and shopping. Ideal for end-users and investors.`,
+    gallery,
+    image: gallery[0],
+    latitude: 15.8497 + (Math.random() * 0.05 - 0.025),
+    longitude: 74.4977 + (Math.random() * 0.05 - 0.025),
+    contactNumber: TEL_NUMBER,
+    whatsappNumber: WA_NUMBER,
+    verified: true,
+    hiveVerified: true,
+    featured: !!h.featured,
+    premium: h.premium,
+    approvedBanks: i % 2 === 0 ? "SBI, HDFC, ICICI" : undefined,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    status: (["Ready to Move", "Under Construction", "New Launch"] as const)[i % 3],
     amenities: AMENITIES.slice(0, 6 + (i % 4)),
     tags: [h.subType, `${h.bhk} BHK`, h.locality, "Belagavi", "Buy"],
-    featured: h.featured,
-    premium: h.premium,
     postedBy: (["Owner", "Agent", "Builder"] as const)[i % 3],
     postedDate: `${(i % 20) + 1} days ago`,
-    hiveVerified: true,
     bhk: h.bhk,
     bathrooms: Math.max(1, h.bhk - 1),
     parking: (i % 3) + 1,
     furnishing: (["Furnished", "Semi-Furnished", "Unfurnished"] as const)[i % 3],
     age: i % 3 === 0 ? "0-1 years" : i % 3 === 1 ? "New" : "5-10 years",
     builder: BUILDERS[i % BUILDERS.length],
+    facingDirection,
+    facing: facingDirection,
+    vastuCompliance: isVastuCompliant(facingDirection),
   };
 });
 
-const landProps: Property[] = LANDS.map((l, i) => {
-  const id = listingNo(cursor++);
-  const gallery = [LAND_IMGS[i % LAND_IMGS.length], LAND_IMGS[(i + 2) % LAND_IMGS.length], LAND_IMGS[(i + 4) % LAND_IMGS.length], LAND_IMGS[(i + 1) % LAND_IMGS.length]].map((x) => img(x));
-  const facing: Facing = l.forceSouth ? "South" : SAFE_FACING[i % SAFE_FACING.length];
-  const subType = l.naStatus === "NA" ? "NA Plot" : "Non-NA Plot";
-  return {
-    id,
+
+export const LANDS: Property[] = [
+  {
+    id: "L100",
+    listingNumber: "L-100",
+    title: "Hive Estate Knp",
+    slug: "hive-estate-knp",
+    propertyType: "NA Plot",
     category: "land",
-    subType,
-    title: `${subType} in ${l.locality}`,
-    price: l.price,
-    pricePerSqft: Math.round(l.price / l.area),
-    area: l.area,
-    locality: l.locality,
+    price: 0,
+    priceOnRequest: true,
+    location: "besides Royal Colony",
+    locality: "Belagavi",
     city: "Belagavi",
-    status: "Available",
-    facing,
-    image: gallery[0],
-    gallery,
-    description: `A ${subType.toLowerCase()} of ${l.area} sqft located in ${l.locality}, Belagavi. Suitable for ${l.ownership === "Agricultural" ? "farming and long-term investment" : "residential development"}. Clear title, ready for immediate purchase.`,
-    amenities: [],
-    tags: [subType, l.naStatus, l.locality, "Belagavi", "Land", "Plot"],
-    featured: l.featured,
-    postedBy: (["Owner", "Agent"] as const)[i % 2],
-    postedDate: `${(i % 20) + 1} days ago`,
+    addressLine: "besides Royal Colony",
+    area: 1200,
+    dimensions: "30*40 and 30*50",
+    layoutName: "Hive Estate Knp",
+    description: "Premium NA / KJP plotting available in Hive Estate Knp besides Royal Colony.",
+    gallery: ["/land-placeholder-1.png", "/land-placeholder-2.png"],
+    latitude: 15.8497,
+    longitude: 74.4977,
+    tags: ["NA Plot", "Buy", "Belagavi"],
+    postedBy: "Agent",
+    postedDate: "2024-03-20",
+    contactNumber: HIVE_PHONE_DISPLAY,
+    whatsappNumber: "919000000000",
+    verified: true,
     hiveVerified: true,
+    featured: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    status: "Available",
+    amenities: [],
     land: {
-      naStatus: l.naStatus,
-      roadWidth: ROAD_WIDTHS[i % ROAD_WIDTHS.length],
-      roadType: ROAD_TYPES[i % ROAD_TYPES.length],
-      electricity: i % 5 !== 4,
-      drainage: i % 3 !== 2,
-      water: i % 4 !== 3,
-      surveyNumber: `SY-${120 + i}/${(i % 9) + 1}${["A", "B", "C"][i % 3]}`,
-      ownership: l.ownership,
-      landmark: `Near ${l.locality} Main Road`,
-      boundary: i % 2 === 0,
-      roadAccess: true,
-    },
-  };
-});
+      plotSize: "1200, 1500 and odd",
+      naStatus: "NA",
+      electricity: true,
+      drainage: true,
+      waterConnection: true,
+      surveyNumber: "SY-10",
+      roadWidth: "40",
+      facingDirection: "East",
+      vastuCompliance: true,
+      nearbyLandmarks: "besides Royal Colony",
+      googleMap: "",
+    }
+  },
+  {
+    id: "L101",
+    listingNumber: "L-101",
+    title: "Savgaon Road Plot",
+    slug: "savgaon-road-plot",
+    propertyType: "Non-NA Plot",
+    category: "land",
+    price: 0,
+    priceOnRequest: true,
+    location: "savgaon road opposite to yash lawn entry",
+    locality: "Belagavi",
+    city: "Belagavi",
+    addressLine: "savgaon road opposite to yash lawn entry",
+    area: 1200,
+    dimensions: "30*40 and 30*50",
+    layoutName: "-",
+    description: "Non NA panchayat layout located on Savgaon road, opposite to Yash lawn entry.",
+    gallery: ["/land-placeholder-2.png", "/land-placeholder-1.png"],
+    latitude: 15.8497,
+    longitude: 74.4977,
+    tags: ["Non-NA Plot", "Buy", "Belagavi", "Panchayat Layout"],
+    postedBy: "Agent",
+    postedDate: "2024-03-21",
+    contactNumber: HIVE_PHONE_DISPLAY,
+    whatsappNumber: "919000000000",
+    verified: true,
+    hiveVerified: true,
+    featured: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    status: "Available",
+    amenities: [],
+    land: {
+      plotSize: "1200, 1500 and odd",
+      naStatus: "Non-NA",
+      electricity: false,
+      drainage: false,
+      waterConnection: false,
+      surveyNumber: "",
+      roadWidth: "30",
+      facingDirection: "East",
+      vastuCompliance: true,
+      nearbyLandmarks: "near angadi college",
+      googleMap: "",
+    }
+  },
+  {
+    id: "L102",
+    listingNumber: "L-102",
+    title: "Buildcon Farmhouse Layout",
+    slug: "buildcon-farmhouse-layout",
+    propertyType: "Non-NA Plot",
+    category: "land",
+    price: 0,
+    priceOnRequest: true,
+    location: "near regenta resort",
+    locality: "Belagavi",
+    city: "Belagavi",
+    addressLine: "near regenta resort",
+    area: 10500,
+    dimensions: "10 gunta per plot",
+    layoutName: "buildcon farmhouse layout",
+    description: "Buildcon farmhouse layout offering 10 gunta per plot. Perfect for weekend getaways.",
+    gallery: ["/land-placeholder-1.png"],
+    latitude: 15.8497,
+    longitude: 74.4977,
+    tags: ["Farmhouse Layout", "Buy", "Belagavi"],
+    postedBy: "Agent",
+    postedDate: "2024-03-22",
+    contactNumber: HIVE_PHONE_DISPLAY,
+    whatsappNumber: "919000000000",
+    verified: true,
+    hiveVerified: true,
+    featured: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    status: "Available",
+    amenities: [],
+    land: {
+      plotSize: "10500 sqft",
+      naStatus: "Non-NA",
+      electricity: true,
+      drainage: false,
+      waterConnection: true,
+      surveyNumber: "",
+      roadWidth: "30",
+      facingDirection: "East",
+      vastuCompliance: true,
+      nearbyLandmarks: "near regenta resort",
+      googleMap: "",
+    }
+  }
+];
 
-export const PROPERTIES: Property[] = [...homeProps, ...landProps];
+export const PROPERTIES: Property[] = [...homeProps, ...LANDS];
 
 // ---------- Helpers ----------
 export const formatINR = (n: number) => {
@@ -250,8 +458,6 @@ export const formatINR = (n: number) => {
 
 export const getProperty = (id: string) => PROPERTIES.find((p) => p.id === id);
 export const byCategory = (c: Category) => PROPERTIES.filter((p) => p.category === c);
-
-export const isVastuCompliant = (facing: Facing) => facing !== "South";
 
 // Search: returns primary matches and nearby locality matches
 export type SearchResult = { primary: Property[]; nearby: Property[]; matchedLocality?: string };
@@ -271,12 +477,13 @@ export const searchProperties = (items: Property[], q: string): SearchResult => 
     return { primary, nearby, matchedLocality };
   }
 
-  const primary = items.filter((p) =>
-    p.title.toLowerCase().includes(query) ||
-    p.locality.toLowerCase().includes(query) ||
-    p.description.toLowerCase().includes(query) ||
-    p.tags.some((t) => t.toLowerCase().includes(query)) ||
-    String(p.area).includes(query),
+  const primary = items.filter(
+    (p) =>
+      p.title.toLowerCase().includes(query) ||
+      p.locality.toLowerCase().includes(query) ||
+      p.description.toLowerCase().includes(query) ||
+      p.tags.some((t) => t.toLowerCase().includes(query)) ||
+      String(p.area).includes(query),
   );
   return { primary, nearby: [] };
 };
@@ -294,16 +501,52 @@ export const BUILDERS_LIST = BUILDERS.map((name, i) => ({
 }));
 
 export const AGENTS_LIST = [
-  { id: "a-1", name: "Rohan Patil",       experience: 8,  rating: 4.8, deals: 120, locality: "Tilakwadi" },
-  { id: "a-2", name: "Aishwarya Desai",   experience: 6,  rating: 4.7, deals: 95,  locality: "Shahapur" },
-  { id: "a-3", name: "Vinay Kulkarni",    experience: 12, rating: 4.9, deals: 210, locality: "Sadashiv Nagar" },
-  { id: "a-4", name: "Priya Naik",        experience: 5,  rating: 4.6, deals: 70,  locality: "Camp" },
-  { id: "a-5", name: "Sameer Joshi",      experience: 10, rating: 4.8, deals: 160, locality: "Vadgaon" },
-  { id: "a-6", name: "Neha Hegde",        experience: 4,  rating: 4.5, deals: 55,  locality: "Nehru Nagar" },
-].map((a, i) => ({ ...a, image: img(HOME_IMGS[(i + 5) % HOME_IMGS.length], 400, 400), phone: HIVE_PHONE_DISPLAY }));
+  { id: "a-1", name: "Rohan Patil", experience: 8, rating: 4.8, deals: 120, locality: "Tilakwadi" },
+  {
+    id: "a-2",
+    name: "Aishwarya Desai",
+    experience: 6,
+    rating: 4.7,
+    deals: 95,
+    locality: "Shahapur",
+  },
+  {
+    id: "a-3",
+    name: "Vinay Kulkarni",
+    experience: 12,
+    rating: 4.9,
+    deals: 210,
+    locality: "Sadashiv Nagar",
+  },
+  { id: "a-4", name: "Priya Naik", experience: 5, rating: 4.6, deals: 70, locality: "Camp" },
+  { id: "a-5", name: "Sameer Joshi", experience: 10, rating: 4.8, deals: 160, locality: "Vadgaon" },
+  { id: "a-6", name: "Neha Hegde", experience: 4, rating: 4.5, deals: 55, locality: "Nehru Nagar" },
+].map((a, i) => ({
+  ...a,
+  image: img(HOME_IMGS[(i + 5) % HOME_IMGS.length], 400, 400),
+  phone: HIVE_PHONE_DISPLAY,
+}));
 
 export const BLOGS = [
-  { id: "1", title: "Top 10 Localities to Invest in Belagavi 2026", excerpt: "A data-backed look at the fastest growing neighborhoods in Belagavi.", date: "Jun 2026", image: img(HOME_IMGS[2], 800, 500) },
-  { id: "2", title: "Home Loan Guide for First-Time Buyers",        excerpt: "Everything you need to know about eligibility, EMIs and documents.",  date: "May 2026", image: img(HOME_IMGS[5], 800, 500) },
-  { id: "3", title: "NA vs Non-NA Land in Karnataka",               excerpt: "Understand the difference before buying land in Belagavi.",             date: "Apr 2026", image: img(LAND_IMGS[0], 800, 500) },
+  {
+    id: "1",
+    title: "Top 10 Localities to Invest in Belagavi 2026",
+    excerpt: "A data-backed look at the fastest growing neighborhoods in Belagavi.",
+    date: "Jun 2026",
+    image: img(HOME_IMGS[2], 800, 500),
+  },
+  {
+    id: "2",
+    title: "Home Loan Guide for First-Time Buyers",
+    excerpt: "Everything you need to know about eligibility, EMIs and documents.",
+    date: "May 2026",
+    image: img(HOME_IMGS[5], 800, 500),
+  },
+  {
+    id: "3",
+    title: "NA vs Non-NA Land in Karnataka",
+    excerpt: "Understand the difference before buying land in Belagavi.",
+    date: "Apr 2026",
+    image: img(LAND_IMGS[0], 800, 500),
+  },
 ];

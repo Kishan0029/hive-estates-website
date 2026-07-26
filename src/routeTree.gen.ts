@@ -13,17 +13,22 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PostPropertyRouteImport } from './routes/post-property'
-import { Route as LoginRouteImport } from './routes/login'
 import { Route as LandRouteImport } from './routes/land'
+import { Route as HiveVerifiedRouteImport } from './routes/hive-verified'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BuyRouteImport } from './routes/buy'
 import { Route as BuildersRouteImport } from './routes/builders'
 import { Route as BlogsRouteImport } from './routes/blogs'
 import { Route as ApartmentsRouteImport } from './routes/apartments'
 import { Route as AgentsRouteImport } from './routes/agents'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as PropertyIdRouteImport } from './routes/property.$id'
+import { Route as AdminLoginRouteImport } from './routes/admin/login'
+import { Route as AdminPropertiesIndexRouteImport } from './routes/admin/properties/index'
+import { Route as AdminPropertiesNewRouteImport } from './routes/admin/properties/new'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -45,14 +50,14 @@ const PostPropertyRoute = PostPropertyRouteImport.update({
   path: '/post-property',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LandRoute = LandRouteImport.update({
   id: '/land',
   path: '/land',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HiveVerifiedRoute = HiveVerifiedRouteImport.update({
+  id: '/hive-verified',
+  path: '/hive-verified',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -85,6 +90,11 @@ const AgentsRoute = AgentsRouteImport.update({
   path: '/agents',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -95,28 +105,53 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const PropertyIdRoute = PropertyIdRouteImport.update({
   id: '/property/$id',
   path: '/property/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPropertiesIndexRoute = AdminPropertiesIndexRouteImport.update({
+  id: '/properties/',
+  path: '/properties/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPropertiesNewRoute = AdminPropertiesNewRouteImport.update({
+  id: '/properties/new',
+  path: '/properties/new',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
   '/agents': typeof AgentsRoute
   '/apartments': typeof ApartmentsRoute
   '/blogs': typeof BlogsRoute
   '/builders': typeof BuildersRoute
   '/buy': typeof BuyRoute
   '/contact': typeof ContactRoute
+  '/hive-verified': typeof HiveVerifiedRoute
   '/land': typeof LandRoute
-  '/login': typeof LoginRoute
   '/post-property': typeof PostPropertyRoute
   '/privacy': typeof PrivacyRoute
   '/projects': typeof ProjectsRoute
   '/terms': typeof TermsRoute
+  '/admin/login': typeof AdminLoginRoute
   '/property/$id': typeof PropertyIdRoute
+  '/admin/': typeof AdminIndexRoute
+  '/admin/properties/new': typeof AdminPropertiesNewRoute
+  '/admin/properties/': typeof AdminPropertiesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -127,50 +162,64 @@ export interface FileRoutesByTo {
   '/builders': typeof BuildersRoute
   '/buy': typeof BuyRoute
   '/contact': typeof ContactRoute
+  '/hive-verified': typeof HiveVerifiedRoute
   '/land': typeof LandRoute
-  '/login': typeof LoginRoute
   '/post-property': typeof PostPropertyRoute
   '/privacy': typeof PrivacyRoute
   '/projects': typeof ProjectsRoute
   '/terms': typeof TermsRoute
+  '/admin/login': typeof AdminLoginRoute
   '/property/$id': typeof PropertyIdRoute
+  '/admin': typeof AdminIndexRoute
+  '/admin/properties/new': typeof AdminPropertiesNewRoute
+  '/admin/properties': typeof AdminPropertiesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
   '/agents': typeof AgentsRoute
   '/apartments': typeof ApartmentsRoute
   '/blogs': typeof BlogsRoute
   '/builders': typeof BuildersRoute
   '/buy': typeof BuyRoute
   '/contact': typeof ContactRoute
+  '/hive-verified': typeof HiveVerifiedRoute
   '/land': typeof LandRoute
-  '/login': typeof LoginRoute
   '/post-property': typeof PostPropertyRoute
   '/privacy': typeof PrivacyRoute
   '/projects': typeof ProjectsRoute
   '/terms': typeof TermsRoute
+  '/admin/login': typeof AdminLoginRoute
   '/property/$id': typeof PropertyIdRoute
+  '/admin/': typeof AdminIndexRoute
+  '/admin/properties/new': typeof AdminPropertiesNewRoute
+  '/admin/properties/': typeof AdminPropertiesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/about'
+    | '/admin'
     | '/agents'
     | '/apartments'
     | '/blogs'
     | '/builders'
     | '/buy'
     | '/contact'
+    | '/hive-verified'
     | '/land'
-    | '/login'
     | '/post-property'
     | '/privacy'
     | '/projects'
     | '/terms'
+    | '/admin/login'
     | '/property/$id'
+    | '/admin/'
+    | '/admin/properties/new'
+    | '/admin/properties/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -181,43 +230,53 @@ export interface FileRouteTypes {
     | '/builders'
     | '/buy'
     | '/contact'
+    | '/hive-verified'
     | '/land'
-    | '/login'
     | '/post-property'
     | '/privacy'
     | '/projects'
     | '/terms'
+    | '/admin/login'
     | '/property/$id'
+    | '/admin'
+    | '/admin/properties/new'
+    | '/admin/properties'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/admin'
     | '/agents'
     | '/apartments'
     | '/blogs'
     | '/builders'
     | '/buy'
     | '/contact'
+    | '/hive-verified'
     | '/land'
-    | '/login'
     | '/post-property'
     | '/privacy'
     | '/projects'
     | '/terms'
+    | '/admin/login'
     | '/property/$id'
+    | '/admin/'
+    | '/admin/properties/new'
+    | '/admin/properties/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AdminRoute: typeof AdminRouteWithChildren
   AgentsRoute: typeof AgentsRoute
   ApartmentsRoute: typeof ApartmentsRoute
   BlogsRoute: typeof BlogsRoute
   BuildersRoute: typeof BuildersRoute
   BuyRoute: typeof BuyRoute
   ContactRoute: typeof ContactRoute
+  HiveVerifiedRoute: typeof HiveVerifiedRoute
   LandRoute: typeof LandRoute
-  LoginRoute: typeof LoginRoute
   PostPropertyRoute: typeof PostPropertyRoute
   PrivacyRoute: typeof PrivacyRoute
   ProjectsRoute: typeof ProjectsRoute
@@ -255,18 +314,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PostPropertyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/land': {
       id: '/land'
       path: '/land'
       fullPath: '/land'
       preLoaderRoute: typeof LandRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hive-verified': {
+      id: '/hive-verified'
+      path: '/hive-verified'
+      fullPath: '/hive-verified'
+      preLoaderRoute: typeof HiveVerifiedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -311,6 +370,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AgentsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -325,6 +391,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/property/$id': {
       id: '/property/$id'
       path: '/property/$id'
@@ -332,20 +405,58 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PropertyIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/properties/': {
+      id: '/admin/properties/'
+      path: '/properties'
+      fullPath: '/admin/properties/'
+      preLoaderRoute: typeof AdminPropertiesIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/properties/new': {
+      id: '/admin/properties/new'
+      path: '/properties/new'
+      fullPath: '/admin/properties/new'
+      preLoaderRoute: typeof AdminPropertiesNewRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
+
+interface AdminRouteChildren {
+  AdminLoginRoute: typeof AdminLoginRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+  AdminPropertiesNewRoute: typeof AdminPropertiesNewRoute
+  AdminPropertiesIndexRoute: typeof AdminPropertiesIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminLoginRoute: AdminLoginRoute,
+  AdminIndexRoute: AdminIndexRoute,
+  AdminPropertiesNewRoute: AdminPropertiesNewRoute,
+  AdminPropertiesIndexRoute: AdminPropertiesIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AdminRoute: AdminRouteWithChildren,
   AgentsRoute: AgentsRoute,
   ApartmentsRoute: ApartmentsRoute,
   BlogsRoute: BlogsRoute,
   BuildersRoute: BuildersRoute,
   BuyRoute: BuyRoute,
   ContactRoute: ContactRoute,
+  HiveVerifiedRoute: HiveVerifiedRoute,
   LandRoute: LandRoute,
-  LoginRoute: LoginRoute,
   PostPropertyRoute: PostPropertyRoute,
   PrivacyRoute: PrivacyRoute,
   ProjectsRoute: ProjectsRoute,
@@ -355,3 +466,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
