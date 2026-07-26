@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { useState } from "react";
 import { GoogleTranslate } from "./GoogleTranslate";
 
@@ -11,6 +11,9 @@ const NAV = [
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isAdmin = pathname.startsWith('/admin');
+  
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background">
       <div className="container-p mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 relative">
@@ -36,9 +39,11 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-2 ml-auto">
-          <div className="hidden sm:block">
-            <GoogleTranslate />
-          </div>
+          {!isAdmin && (
+            <div className="block mr-1 sm:mr-0">
+              <GoogleTranslate />
+            </div>
+          )}
           <Link 
             to="/post-property" 
             className="hidden sm:inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2"
@@ -69,9 +74,6 @@ export function Navbar() {
                 {n.label}
               </Link>
             ))}
-            <div className="px-3 py-2 mt-2 border-t border-border/50">
-              <GoogleTranslate />
-            </div>
             <Link 
               to="/post-property" 
               onClick={() => setOpen(false)}
