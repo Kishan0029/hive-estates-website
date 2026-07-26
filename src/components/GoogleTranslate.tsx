@@ -62,10 +62,23 @@ export function GoogleTranslate() {
 
     // 2. Persist the choice in cookies manually just in case
     if (code === "en") {
-      document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-      document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=.${window.location.hostname}; path=/;`;
-      document.cookie = "googtrans=/en/en; path=/;";
-      document.cookie = `googtrans=/en/en; domain=.${window.location.hostname}; path=/;`;
+      const domains = [window.location.hostname, `.${window.location.hostname}`, ''];
+      const paths = ['/', window.location.pathname];
+      
+      domains.forEach(d => {
+        paths.forEach(p => {
+          const domainStr = d ? `domain=${d};` : '';
+          document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${p}; ${domainStr}`;
+        });
+      });
+      
+      try {
+        window.localStorage.removeItem("googtrans");
+        window.sessionStorage.removeItem("googtrans");
+      } catch (e) {}
+      
+      window.location.reload();
+      return;
     } else {
       document.cookie = `googtrans=/en/${code}; path=/;`;
       document.cookie = `googtrans=/en/${code}; domain=.${window.location.hostname}; path=/;`;
