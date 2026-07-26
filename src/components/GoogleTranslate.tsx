@@ -51,9 +51,13 @@ export function GoogleTranslate() {
     let nativeTriggered = false;
     
     if (select) {
-      select.value = code === "en" ? "" : code;
-      select.dispatchEvent(new Event('change'));
-      nativeTriggered = true;
+      if (code === "en") {
+        nativeTriggered = false; // Force reload to clear translation
+      } else {
+        select.value = code;
+        select.dispatchEvent(new Event('change'));
+        nativeTriggered = true;
+      }
     }
 
     // 2. Persist the choice in cookies manually just in case

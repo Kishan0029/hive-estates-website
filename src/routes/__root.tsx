@@ -109,6 +109,24 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var match = document.cookie.match(/(?:^|;)\\s*googtrans=([^;]*)/);
+                  if (match && match[1] !== '/en/en' && match[1] !== 'en') {
+                    document.documentElement.style.opacity = '0';
+                    setTimeout(function() {
+                      document.documentElement.style.transition = 'opacity 0.4s ease-in-out';
+                      document.documentElement.style.opacity = '1';
+                    }, 500);
+                  }
+                } catch(e) {}
+              })();
+            `
+          }}
+        />
       </head>
       <body>
         {children}
