@@ -32,7 +32,11 @@ export function GoogleTranslate() {
       window.googleTranslateElementInit = () => {
         if (window.google?.translate) {
           new window.google.translate.TranslateElement(
-            { pageLanguage: "en", autoDisplay: false },
+            { 
+              pageLanguage: "auto", 
+              includedLanguages: "en,mr,kn,hi",
+              autoDisplay: false 
+            },
             "google_translate_element"
           );
         }
@@ -50,11 +54,28 @@ export function GoogleTranslate() {
     const select = document.querySelector('.goog-te-combo') as HTMLSelectElement | null;
     let nativeTriggered = false;
     
-    if (select) {
-      if (code === "en") {
-        nativeTriggered = false; // Force reload to clear translation
-      } else {
-        select.value = code;
+    if (code === "en") {
+      try {
+        const iframe = document.querySelector('iframe.goog-te-banner-frame') as HTMLIFrameElement;
+        if (iframe) {
+          const innerDoc = iframe.contentDocument || iframe.contentWindow?.document;
+          const restoreBtn = innerDoc?.querySelector('[id$=".restore"]') as HTMLElement | null;
+          if (restoreBtn) {
+            restoreBtn.click();
+            nativeTriggered = true;
+          }
+        }
+      } catch (e) {
+        console.error("Failed to click restore button inside iframe:", e);
+      }
+    }
+    
+    if (!nativeTriggered && select) {
+      // With pageLanguage: 'auto', English is actually in the dropdown!
+      select.value = code;
+      
+      // Safety check: if Google Translate refused to set the value (e.g. option missing)
+      if (select.value === code) {
         select.dispatchEvent(new Event('change'));
         nativeTriggered = true;
       }
