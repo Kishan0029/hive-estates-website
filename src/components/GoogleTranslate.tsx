@@ -46,7 +46,17 @@ export function GoogleTranslate() {
   }, []);
 
   const changeLanguage = (code: string) => {
-    // Aggressively set and clear cookies for both current domain and root
+    // 1. Try to trigger the native Google Translate dropdown (Smooth, no reload)
+    const select = document.querySelector('.goog-te-combo') as HTMLSelectElement | null;
+    let nativeTriggered = false;
+    
+    if (select) {
+      select.value = code === "en" ? "" : code;
+      select.dispatchEvent(new Event('change'));
+      nativeTriggered = true;
+    }
+
+    // 2. Persist the choice in cookies manually just in case
     if (code === "en") {
       document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=.${window.location.hostname}; path=/;`;
@@ -62,7 +72,12 @@ export function GoogleTranslate() {
       window.sessionStorage.removeItem("googtrans");
     } catch (e) {}
 
-    window.location.reload();
+    setCurrentLang(code); // update UI state immediately
+
+    // 3. Fallback: only reload if the native dropdown wasn't found
+    if (!nativeTriggered) {
+      window.location.reload();
+    }
   };
 
   return (
