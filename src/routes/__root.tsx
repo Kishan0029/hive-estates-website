@@ -13,6 +13,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { FloatingWhatsApp } from "@/components/WhatsApp";
+import { motion, AnimatePresence } from "framer-motion";
 
 function NotFoundComponent() {
   return (
@@ -138,13 +139,24 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  
   return (
     <QueryClientProvider client={queryClient}>
       <div className="flex min-h-screen flex-col">
         <Navbar />
-        <main className="flex-1">
-          <Outlet />
-        </main>
+        <AnimatePresence mode="wait">
+          <motion.main
+            key={pathname}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="flex-1 flex flex-col"
+          >
+            <Outlet />
+          </motion.main>
+        </AnimatePresence>
         <Footer />
         <FloatingWhatsApp />
       </div>

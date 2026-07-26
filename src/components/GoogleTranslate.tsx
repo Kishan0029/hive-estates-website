@@ -50,71 +50,75 @@ export function GoogleTranslate() {
   }, []);
 
   const changeLanguage = (code: string) => {
-    // 1. Try to trigger the native Google Translate dropdown (Smooth, no reload)
-    const select = document.querySelector('.goog-te-combo') as HTMLSelectElement | null;
-    let nativeTriggered = false;
-    
-    if (code === "en") {
-      try {
-        const iframe = document.querySelector('iframe.goog-te-banner-frame') as HTMLIFrameElement;
-        if (iframe) {
-          const innerDoc = iframe.contentDocument || iframe.contentWindow?.document;
-          const restoreBtn = innerDoc?.querySelector('[id$=".restore"]') as HTMLElement | null;
-          if (restoreBtn) {
-            restoreBtn.click();
-            nativeTriggered = true;
+    const executeTranslation = () => {
+      // 1. Try to trigger the native Google Translate dropdown (Smooth, no reload)
+      const select = document.querySelector('.goog-te-combo') as HTMLSelectElement | null;
+      let nativeTriggered = false;
+      
+      if (code === "en") {
+        try {
+          const iframe = document.querySelector('iframe.goog-te-banner-frame') as HTMLIFrameElement;
+          if (iframe) {
+            const innerDoc = iframe.contentDocument || iframe.contentWindow?.document;
+            const restoreBtn = innerDoc?.querySelector('[id$=".restore"]') as HTMLElement | null;
+            if (restoreBtn) {
+              restoreBtn.click();
+              nativeTriggered = true;
+            }
           }
+        } catch (e) {
+          console.error("Failed to click restore button inside iframe:", e);
         }
-      } catch (e) {
-        console.error("Failed to click restore button inside iframe:", e);
       }
-    }
-    
-    if (!nativeTriggered && select) {
-      // With pageLanguage: 'auto', English is actually in the dropdown!
-      select.value = code;
       
-      // Safety check: if Google Translate refused to set the value (e.g. option missing)
-      if (select.value === code) {
-        select.dispatchEvent(new Event('change'));
-        nativeTriggered = true;
+      if (!nativeTriggered && select) {
+        // With pageLanguage: 'auto', English is actually in the dropdown!
+        select.value = code;
+        
+        // Safety check: if Google Translate refused to set the value (e.g. option missing)
+        if (select.value === code) {
+          select.dispatchEvent(new Event('change'));
+          nativeTriggered = true;
+        }
       }
-    }
 
-    // 2. Persist the choice in cookies manually just in case
-    if (code === "en") {
-      const domains = [window.location.hostname, `.${window.location.hostname}`, ''];
-      const paths = ['/', window.location.pathname];
-      
-      domains.forEach(d => {
-        paths.forEach(p => {
-          const domainStr = d ? `domain=${d};` : '';
-          document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${p}; ${domainStr}`;
+      // 2. Persist the choice in cookies manually just in case
+      if (code === "en") {
+        const domains = [window.location.hostname, `.${window.location.hostname}`, ''];
+        const paths = ['/', window.location.pathname];
+        
+        domains.forEach(d => {
+          paths.forEach(p => {
+            const domainStr = d ? `domain=${d};` : '';
+            document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${p}; ${domainStr}`;
+          });
         });
-      });
+        
+        try {
+          window.localStorage.removeItem("googtrans");
+          window.sessionStorage.removeItem("googtrans");
+        } catch (e) {}
+      } else {
+        document.cookie = `googtrans=/en/${code}; path=/;`;
+        document.cookie = `googtrans=/en/${code}; domain=.${window.location.hostname}; path=/;`;
+      }
       
-      try {
-        window.localStorage.removeItem("googtrans");
-        window.sessionStorage.removeItem("googtrans");
-      } catch (e) {}
-      
-      window.location.reload();
-      return;
+      setCurrentLang(code); // update UI state immediately
+    };
+
+    // Smooth transition wrapper
+    const mainContent = document.querySelector('main');
+    if (mainContent) {
+      mainContent.style.transition = 'opacity 0.2s ease-out';
+      mainContent.style.opacity = '0';
+      setTimeout(() => {
+        executeTranslation();
+        setTimeout(() => {
+          mainContent.style.opacity = '1';
+        }, 150);
+      }, 200);
     } else {
-      document.cookie = `googtrans=/en/${code}; path=/;`;
-      document.cookie = `googtrans=/en/${code}; domain=.${window.location.hostname}; path=/;`;
-    }
-    
-    try {
-      window.localStorage.removeItem("googtrans");
-      window.sessionStorage.removeItem("googtrans");
-    } catch (e) {}
-
-    setCurrentLang(code); // update UI state immediately
-
-    // 3. Fallback: only reload if the native dropdown wasn't found
-    if (!nativeTriggered) {
-      window.location.reload();
+      executeTranslation();
     }
   };
 
