@@ -146,17 +146,20 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <div className="flex min-h-screen flex-col">
         <Navbar />
-        <AnimatePresence mode="wait">
-          <motion.main
-            key={pathname}
-            initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.4, ease: "easeOut" } }}
-            exit={{ opacity: 0, y: -10, filter: "blur(4px)", transition: { duration: 0.2, ease: "easeIn" } }}
-            className={`flex-1 flex flex-col ${pathname.startsWith('/admin') ? 'notranslate' : ''}`}
-          >
-            <Outlet />
-          </motion.main>
-        </AnimatePresence>
+        <div className="flex-1 relative flex flex-col">
+          <AnimatePresence>
+            <motion.main
+              key={pathname}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, position: "absolute", inset: 0 }}
+              transition={{ duration: 0.5, ease: "easeInOut" }}
+              className={`flex-1 flex flex-col bg-background ${pathname.startsWith('/admin') ? 'notranslate' : ''}`}
+            >
+              <Outlet />
+            </motion.main>
+          </AnimatePresence>
+        </div>
         <Footer />
         <FloatingWhatsApp />
       </div>
