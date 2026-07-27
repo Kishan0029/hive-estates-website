@@ -157,7 +157,7 @@ function VerifiedCard({ p }: { p: Property }) {
         </div>
         <div className="mt-4 flex items-center justify-between gap-3">
           <div>
-            <p className="font-bold text-primary text-lg">{formatINR(p.price)}</p>
+            <p className="font-bold text-primary text-lg">{p.priceOnRequest ? "Request Price" : formatINR(p.price)}</p>
             {p.pricePerSqFt && <p className="text-xs text-muted-foreground">₹{p.pricePerSqFt}/sqft</p>}
           </div>
           <div className="flex gap-2">

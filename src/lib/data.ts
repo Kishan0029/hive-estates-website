@@ -49,6 +49,13 @@ export type Property = {
   createdAt: string;
   updatedAt: string;
 
+  // Nearby Hotspots
+  schools?: string;
+  hospitals?: string;
+  shopping?: string;
+  connectivity?: string;
+  vastuCompliant?: boolean;
+
   // Legacy/UI specific fields for backward compatibility
   locality: string;
   city: string;

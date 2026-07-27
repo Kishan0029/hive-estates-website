@@ -1,9 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { getAdminPropertiesFn } from "@/server-fns/properties";
+import { getAdminPropertiesFn, deletePropertyFn } from "@/server-fns/properties";
 import { useState } from "react";
+import { useRouter } from "@tanstack/react-router";
 // Remove Lucide icons if not already installed, I'll use inline SVGs for stability
 
+type PropertiesSearch = { status?: string };
+
 export const Route = createFileRoute("/admin/properties/")({
+  validateSearch: (s: Record<string, unknown>): PropertiesSearch => ({ 
+    status: typeof s.status === "string" ? s.status : undefined 
+  }),
   loader: async () => {
     const properties = await getAdminPropertiesFn();
     return { properties };
@@ -13,11 +19,29 @@ export const Route = createFileRoute("/admin/properties/")({
 
 function AdminPropertiesList() {
   const { properties } = Route.useLoaderData();
+  const { status } = Route.useSearch();
+  const router = useRouter();
   const [search, setSearch] = useState("");
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
-  const filtered = properties?.filter(p => 
-    p.title.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = properties?.filter(p => {
+    const matchesSearch = p.title.toLowerCase().includes(search.toLowerCase());
+    const matchesStatus = status ? p.status === status : true;
+    return matchesSearch && matchesStatus;
+  });
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this property?")) return;
+    setIsDeleting(id);
+    try {
+      await deletePropertyFn({ data: { id } });
+      router.invalidate();
+    } catch (err: any) {
+      alert("Failed to delete: " + err.message);
+    } finally {
+      setIsDeleting(null);
+    }
+  };
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -29,12 +53,23 @@ function AdminPropertiesList() {
         
         <Link 
           to="/admin/properties/new"
-          className="rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white shadow-sm hover:opacity-90 transition-all inline-flex items-center gap-2"
+          className="rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white shadow-sm hover:opacity-90 transition-all inline-flex items-center gap-2 shrink-0"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
           Add Property
         </Link>
       </div>
+
+      {status && (
+        <div className="mb-4 flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border">
+          <p className="text-sm font-bold text-foreground">
+            Filtering by status: <span className="text-primary">{status}</span>
+          </p>
+          <Link to="/admin/properties" className="text-xs font-semibold text-muted-foreground hover:text-foreground">
+            Clear Filter
+          </Link>
+        </div>
+      )}
 
       <div className="rounded-3xl border border-border bg-card shadow-sm overflow-hidden flex flex-col">
         <div className="px-6 py-4 border-b border-border bg-muted/20">
@@ -88,8 +123,14 @@ function AdminPropertiesList() {
                       {new Date(p.created_at).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 text-right space-x-2">
-                      <button className="text-primary font-semibold text-xs hover:underline">Edit</button>
-                      <button className="text-destructive font-semibold text-xs hover:underline">Delete</button>
+                      <Link to="/admin/properties/$id/edit" params={{ id: p.id }} className="text-primary font-semibold text-xs hover:underline">Edit</Link>
+                      <button 
+                        onClick={() => handleDelete(p.id)}
+                        disabled={isDeleting === p.id}
+                        className="text-destructive font-semibold text-xs hover:underline disabled:opacity-50"
+                      >
+                        {isDeleting === p.id ? "Deleting..." : "Delete"}
+                      </button>
                     </td>
                   </tr>
                 ))

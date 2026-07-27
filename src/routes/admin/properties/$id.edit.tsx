@@ -1,17 +1,15 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { uploadImageToServerFn, createPropertyFn } from "@/server-fns/properties";
+import { getPropertyByIdFn, updatePropertyFn, uploadImageToServerFn } from "@/server-fns/properties";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
-const optionalNumber = z.preprocess(
-  (val) => (val === "" || val === undefined || val === null || Number.isNaN(Number(val))) ? null : Number(val),
-  z.number().nullable()
-);
-
-export const Route = createFileRoute("/admin/properties/new")({
-  component: AddProperty,
+export const Route = createFileRoute("/admin/properties/$id/edit")({
+  loader: async ({ params }) => {
+    return await getPropertyByIdFn({ data: { id: params.id } });
+  },
+  component: EditProperty,
 });
 
 const schema = z.object({
@@ -20,64 +18,90 @@ const schema = z.object({
   property_type: z.enum(["apartment", "villa", "plot", "commercial"]),
   listing_type: z.enum(["sale", "rent"]),
   price: z.number({ invalid_type_error: "Price is required" }).min(1, "Price must be greater than 0"),
-  area_sqft: optionalNumber,
+  area_sqft: z.number({ invalid_type_error: "Area must be a number" }).optional().nullable(),
   city: z.string().min(2, "City is required"),
   status: z.enum(["draft", "active", "sold", "rented"]),
   price_on_request: z.boolean(),
   description: z.string().optional().nullable(),
-  bhk: optionalNumber,
-  bathrooms: optionalNumber,
-  parking: optionalNumber,
+  bhk: z.number({ invalid_type_error: "BHK must be a number" }).optional().nullable(),
+  bathrooms: z.number({ invalid_type_error: "Bathrooms must be a number" }).optional().nullable(),
+  parking: z.number({ invalid_type_error: "Parking must be a number" }).optional().nullable(),
   facing_direction: z.string().optional().nullable(),
-  furnishing: z.string().optional(),
-  property_age: z.string().optional(),
-  dimensions: z.string().optional(),
-  layout_name: z.string().optional(),
-  na_status: z.string().optional(),
+  furnishing: z.string().optional().nullable(),
+  property_age: z.string().optional().nullable(),
+  dimensions: z.string().optional().nullable(),
+  layout_name: z.string().optional().nullable(),
+  na_status: z.string().optional().nullable(),
   rera_approved: z.boolean().optional(),
   premium: z.boolean().optional(),
   featured: z.boolean().optional(),
-  amenities: z.string().optional(), // Will be split by comma
+  amenities: z.string().optional().nullable(), // Will be split by comma
   electricity: z.boolean().optional(),
   drainage: z.boolean().optional(),
   water_connection: z.boolean().optional(),
   vastu_compliant: z.boolean().optional(),
-  approvals: z.string().optional(),
-  survey_number: z.string().optional(),
-  nearby_landmarks: z.string().optional(),
-  schools: z.string().optional(),
-  hospitals: z.string().optional(),
-  shopping: z.string().optional(),
-  connectivity: z.string().optional(),
-  road_width: optionalNumber,
+  approvals: z.string().optional().nullable(),
+  survey_number: z.string().optional().nullable(),
+  nearby_landmarks: z.string().optional().nullable(),
+  schools: z.string().optional().nullable(),
+  hospitals: z.string().optional().nullable(),
+  shopping: z.string().optional().nullable(),
+  connectivity: z.string().optional().nullable(),
+  road_width: z.number({ invalid_type_error: "Road width must be a number" }).optional().nullable(),
 });
 
 // Remove FormValues type
 
-function AddProperty() {
+function EditProperty() {
+  const property = Route.useLoaderData();
+  const { id } = Route.useParams();
   const navigate = useNavigate();
+  
   const [images, setImages] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm({
+  const { register, handleSubmit, watch, reset, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
-      listing_type: "sale",
-      property_type: "plot",
-      status: "draft",
-      price_on_request: false,
-      city: "Belagavi",
-      rera_approved: false,
-      premium: false,
-      featured: false,
-      electricity: false,
-      drainage: false,
-      water_connection: false,
-      vastu_compliant: false,
+      title: property.title,
+      slug: property.slug,
+      property_type: property.property_type,
+      listing_type: property.listing_type,
+      price: property.price,
+      area_sqft: property.area_sqft,
+      city: property.city,
+      status: property.status,
+      price_on_request: property.price_on_request,
+      description: property.description || "",
+      bhk: property.bhk,
+      bathrooms: property.bathrooms,
+      parking: property.parking,
+      facing_direction: property.facing_direction || "",
+      furnishing: property.furnishing || "",
+      property_age: property.property_age || "",
+      dimensions: property.dimensions || "",
+      layout_name: property.layout_name || "",
+      na_status: property.na_status || "",
+      rera_approved: property.rera_approved || false,
+      premium: property.premium || false,
+      featured: property.featured || false,
+      electricity: property.electricity || false,
+      drainage: property.drainage || false,
+      water_connection: property.water_connection || false,
+      vastu_compliant: property.vastu_compliant || false,
+      approvals: property.approvals || "",
+      survey_number: property.survey_number || "",
+      nearby_landmarks: property.nearby_landmarks || "",
+      schools: property.schools || "",
+      hospitals: property.hospitals || "",
+      shopping: property.shopping || "",
+      connectivity: property.connectivity || "",
+      road_width: property.road_width,
+      amenities: property.amenities ? property.amenities.join(", ") : "",
     }
   });
-  
+
   const propertyType = watch("property_type");
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -120,20 +144,25 @@ function AddProperty() {
     setSubmitError(null);
     setUploading(true);
     try {
-      const uploadedImageKeys = await uploadImagesToR2();
+      let imageKeys: string[] | undefined = undefined;
+      
+      if (images.length > 0) {
+        imageKeys = await uploadImagesToR2();
+      }
 
-      await createPropertyFn({
+      await updatePropertyFn({
         data: {
+          id,
           data: {
             ...data,
             area_sqft: data.area_sqft ? Number(data.area_sqft) : undefined,
             amenities: data.amenities ? data.amenities.split(',').map((a: string) => a.trim()).filter(Boolean) : [],
           },
-          imageKeys: uploadedImageKeys
+          imageKeys
         }
       });
       
-      alert("Property published successfully!");
+      alert("Property updated successfully!");
       navigate({ to: "/admin/properties" });
     } catch (err: any) {
       setSubmitError(err.message || "An error occurred");
@@ -145,8 +174,8 @@ function AddProperty() {
   return (
     <div className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="mb-8">
-        <h1 className="font-display text-2xl font-bold tracking-tight">Add New Property</h1>
-        <p className="text-sm text-muted-foreground mt-1">Fill out the complete details below to create a new listing.</p>
+        <h1 className="font-display text-2xl font-bold tracking-tight">Edit Property</h1>
+        <p className="text-sm text-muted-foreground mt-1">Make changes to the listing below.</p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
@@ -326,14 +355,14 @@ function AddProperty() {
                 <option value="North-East">North-East</option>
               </select>
             </div>
-
+            
             <div className="flex items-end pb-2">
               <div className="flex items-center gap-2">
                 <input type="checkbox" id="vastu_compliant" {...register("vastu_compliant")} className="w-4 h-4 rounded border-border" />
                 <label htmlFor="vastu_compliant" className="text-sm font-semibold">Vastu Compliant</label>
               </div>
             </div>
-            
+
             <div className="md:col-span-3">
               <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Amenities (Comma separated)</label>
               <input {...register("amenities")} className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:border-primary transition outline-none" placeholder="e.g. Swimming Pool, Gym, 24x7 Security" />
@@ -405,17 +434,17 @@ function AddProperty() {
         {/* MEDIA */}
         <div className="rounded-3xl border border-border bg-card shadow-sm overflow-hidden">
           <div className="px-8 py-5 border-b border-border bg-muted/20">
-            <h2 className="font-bold">Media</h2>
+            <h2 className="font-bold">Media (Re-uploading overwrites old images)</h2>
           </div>
           <div className="p-8">
-             <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Upload Images (R2 Edge Storage)</label>
+             <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Upload New Images (Optional)</label>
              <div className="border-2 border-dashed border-border rounded-2xl p-10 text-center hover:bg-muted/10 transition cursor-pointer relative">
                 <input type="file" multiple accept="image/*" onChange={handleImageChange} className="absolute inset-0 opacity-0 cursor-pointer" />
                 <div className="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                 </div>
-                <p className="font-bold text-foreground">Click or drag images here</p>
-                <p className="text-sm text-muted-foreground mt-1">High-resolution JPEGs or PNGs</p>
+                <p className="font-bold text-foreground">Click or drag images here to overwrite</p>
+                <p className="text-sm text-muted-foreground mt-1">Leave empty to keep existing images.</p>
              </div>
              {images.length > 0 && (
                <div className="mt-4 flex gap-4 overflow-x-auto py-2">
@@ -439,7 +468,7 @@ function AddProperty() {
             Cancel
           </button>
           <button type="submit" disabled={isSubmitting || uploading} className="px-8 py-3 rounded-xl bg-primary text-white font-bold text-sm shadow-md hover:opacity-90 hover:-translate-y-0.5 transition disabled:opacity-50">
-            {uploading || isSubmitting ? "Saving & Uploading..." : "Publish Property"}
+            {uploading || isSubmitting ? "Updating..." : "Update Property"}
           </button>
         </div>
       </form>

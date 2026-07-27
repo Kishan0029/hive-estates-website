@@ -1,10 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { getAdminDashboardStatsFn } from "@/server-fns/properties";
 
 export const Route = createFileRoute("/admin/")({
+  loader: async () => await getAdminDashboardStatsFn(),
   component: AdminDashboard,
 });
 
 function AdminDashboard() {
+  const stats = Route.useLoaderData();
+
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
@@ -23,12 +27,12 @@ function AdminDashboard() {
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
         {[
-          { label: "Active Listings", value: "24", icon: "🏠", color: "text-primary", bg: "bg-primary/10", border: "border-primary/20" },
-          { label: "Pending Approvals", value: "3", icon: "⏳", color: "text-accent-foreground", bg: "bg-accent/20", border: "border-accent/30" },
-          { label: "Total Inquiries", value: "142", icon: "💬", color: "text-success", bg: "bg-success/10", border: "border-success/20" },
-          { label: "Properties Sold", value: "8", icon: "✓", color: "text-muted-foreground", bg: "bg-secondary", border: "border-border" },
+          { label: "Active Listings", value: stats.activeListings, icon: "🏠", color: "text-primary", bg: "bg-primary/10", border: "border-primary/20", href: "/admin/properties?status=active" },
+          { label: "Pending Approvals", value: stats.pendingApprovals, icon: "⏳", color: "text-accent-foreground", bg: "bg-accent/20", border: "border-accent/30", href: "/admin/properties?status=draft" },
+          { label: "Properties Sold", value: stats.propertiesSold, icon: "✓", color: "text-muted-foreground", bg: "bg-secondary", border: "border-border", href: "/admin/properties?status=sold" },
+          { label: "Total Inquiries", value: stats.totalInquiries, icon: "💬", color: "text-success", bg: "bg-success/10", border: "border-success/20", href: "/admin/inquiries" },
         ].map((stat, i) => (
-          <div key={i} className={`rounded-3xl border ${stat.border} bg-card p-6 shadow-sm hover:shadow-md transition-all duration-300 group cursor-default`}>
+          <Link to={stat.href} key={i} className={`rounded-3xl border ${stat.border} bg-card p-6 shadow-sm hover:shadow-md transition-all duration-300 group`}>
             <div className="flex items-center justify-between">
               <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl ${stat.bg} group-hover:scale-110 transition-transform duration-300`}>
                 {stat.icon}
@@ -36,7 +40,7 @@ function AdminDashboard() {
               <p className={`font-display text-4xl font-black ${stat.color} tracking-tighter`}>{stat.value}</p>
             </div>
             <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mt-5">{stat.label}</p>
-          </div>
+          </Link>
         ))}
       </div>
 
@@ -56,12 +60,12 @@ function AdminDashboard() {
               </div>
             </Link>
             
-            <Link to="/admin" className="flex flex-col gap-3 p-6 rounded-2xl border border-border bg-background hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 transition-all group opacity-75">
+            <Link to="/admin/inquiries" className="flex flex-col gap-3 p-6 rounded-2xl border border-border bg-background hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 transition-all group">
               <div className="w-10 h-10 rounded-xl bg-secondary text-foreground flex items-center justify-center group-hover:scale-110 transition-transform">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
               </div>
               <div>
-                <h3 className="font-bold text-foreground">View Leads (Coming Soon)</h3>
+                <h3 className="font-bold text-foreground">View Leads</h3>
                 <p className="text-xs text-muted-foreground mt-1">Check customer inquiries.</p>
               </div>
             </Link>

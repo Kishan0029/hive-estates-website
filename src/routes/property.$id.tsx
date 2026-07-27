@@ -2,9 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   formatINR,
-  getProperty,
   isVastuCompliant,
-  PROPERTIES,
   telHref,
   waHrefFor,
   HIVE_PHONE_DISPLAY,
@@ -12,20 +10,27 @@ import {
 } from "@/lib/data";
 import { PropertyGrid, Section } from "@/components/Section";
 import { HiveVerifiedBadge } from "@/components/PropertyCard";
+import { getPublicPropertyByIdFn, getPublicPropertiesFn } from "@/server-fns/public";
+import { createInquiryFn } from "@/server-fns/properties";
 
 export const Route = createFileRoute("/property/$id")({
-  loader: ({ params }): Property => {
-    const p = getProperty(params.id);
-    if (!p) throw notFound();
-    return p;
+  loader: async ({ params }) => {
+    try {
+      const p = await getPublicPropertyByIdFn({ data: { id: params.id } });
+      const allProps = await getPublicPropertiesFn();
+      const similar = allProps.filter((x: any) => x.id !== p.id && x.category === p.category).slice(0, 4);
+      return { property: p, similar };
+    } catch {
+      throw notFound();
+    }
   },
   head: ({ loaderData }) => ({
     meta: loaderData
       ? [
-          { title: `${loaderData.title} (${loaderData.id}) — Hive Estate` },
-          { name: "description", content: loaderData.description.slice(0, 160) },
-          { property: "og:title", content: `${loaderData.title} — Hive Estate` },
-          { property: "og:image", content: loaderData.image },
+          { title: `${loaderData.property.title} (#${loaderData.property.listingNumber}) — Hive Estate` },
+          { name: "description", content: loaderData.property.description.slice(0, 160) },
+          { property: "og:title", content: `${loaderData.property.title} — Hive Estate` },
+          { property: "og:image", content: loaderData.property.image },
         ]
       : [{ title: "Property not found" }, { name: "robots", content: "noindex" }],
   }),
@@ -33,19 +38,45 @@ export const Route = createFileRoute("/property/$id")({
 });
 
 function Detail() {
-  const p = Route.useLoaderData() as Property;
+  const data = Route.useLoaderData();
+  const p = data.property as Property;
+  const similar = data.similar as Property[];
   const [main, setMain] = useState(p.gallery[0]);
   const [emi, setEmi] = useState({ amount: p.price, rate: 8.5, years: 20 });
-  const similar = PROPERTIES.filter((x) => x.id !== p.id && x.category === p.category).slice(0, 4);
   const monthly = calcEmi(emi.amount, emi.rate, emi.years);
-  const vastu = isVastuCompliant(p.facingDirection);
+  const vastu = p.vastuCompliant;
+
+  // Form State
+  const [inquiry, setInquiry] = useState({ name: "", phone: "", email: "", message: `I'm interested in listing #${p.listingNumber}...` });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleInquirySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inquiry.name || !inquiry.phone) return alert("Please enter your name and phone number");
+    setIsSubmitting(true);
+    try {
+      await createInquiryFn({
+        data: {
+          property_id: p.id,
+          ...inquiry
+        }
+      });
+      setSubmitted(true);
+      setInquiry({ name: "", phone: "", email: "", message: "" });
+    } catch (err: any) {
+      alert("Failed to send inquiry: " + err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="container-p mx-auto max-w-7xl mt-6">
       {/* Listing number + verified banner */}
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <span className="rounded-md bg-primary text-primary-foreground text-xs font-bold px-3 py-1.5 tracking-wide">
-          Listing #{p.id}
+          Listing #{p.listingNumber}
         </span>
         <HiveVerifiedBadge large />
         {p.featured && (
@@ -96,7 +127,7 @@ function Detail() {
             ) : (
               <>
                 <span className="font-display text-4xl font-bold text-primary">
-                  ₹ {formatINR(p.price)}
+                  {p.priceOnRequest ? "Request Price" : `₹ ${formatINR(p.price)}`}
                 </span>
                 {p.pricePerSqFt && (
                   <span className="text-sm text-muted-foreground font-semibold">
@@ -202,22 +233,24 @@ function Detail() {
           )}
 
           {/* NEARBY */}
-          <section className="mt-8">
-            <h2 className="text-lg font-bold mb-3">What's nearby</h2>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {[
-                ["Schools", "KLE School (0.8 km), Gogte School (1.2 km)"],
-                ["Hospitals", "KLES Hospital (2 km), Belgaum Institute (1.5 km)"],
-                ["Shopping", "Big Bazaar (1.1 km), City Market (0.9 km)"],
-                ["Connectivity", "Railway Station (3 km), Bus Stand (2 km)"],
-              ].map(([k, v]) => (
-                <div key={k} className="rounded-lg border border-border bg-card p-4">
-                  <div className="font-semibold text-sm">{k}</div>
-                  <div className="text-xs text-muted-foreground mt-1">{v}</div>
-                </div>
-              ))}
-            </div>
-          </section>
+          {(p.schools || p.hospitals || p.shopping || p.connectivity) && (
+            <section className="mt-8">
+              <h2 className="text-lg font-bold mb-3">What's nearby</h2>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {[
+                  ["Schools", p.schools],
+                  ["Hospitals", p.hospitals],
+                  ["Shopping", p.shopping],
+                  ["Connectivity", p.connectivity],
+                ].filter(([_, v]) => !!v).map(([k, v]) => (
+                  <div key={k as string} className="rounded-lg border border-border bg-card p-4">
+                    <div className="font-semibold text-sm">{k as string}</div>
+                    <div className="text-xs text-muted-foreground mt-1">{v as string}</div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
           {/* EMI (homes only) */}
           {p.category === "home" && (
@@ -279,7 +312,7 @@ function Detail() {
         <aside className="lg:sticky lg:top-20 lg:self-start rounded-xl border border-border bg-card p-6 shadow-card space-y-4">
           <div>
             <div className="text-sm text-muted-foreground">Listing</div>
-            <div className="font-display font-bold text-primary text-lg">#{p.id}</div>
+            <div className="font-display font-bold text-primary text-lg">#{p.listingNumber}</div>
             <div className="text-xs text-muted-foreground mt-2">
               Posted by <span className="font-semibold text-foreground">{p.postedBy}</span> ·{" "}
               {p.postedDate}
@@ -330,28 +363,50 @@ function Detail() {
 
           <form
             className="space-y-3 pt-3 border-t border-border"
-            onSubmit={(e) => e.preventDefault()}
+            onSubmit={handleInquirySubmit}
           >
-            <input
-              placeholder="Your Name"
-              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-            />
-            <input
-              placeholder="Phone Number"
-              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-            />
-            <input
-              placeholder="Email"
-              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-            />
-            <textarea
-              rows={3}
-              placeholder={`I'm interested in listing #${p.id}...`}
-              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-            />
-            <button className="w-full rounded-md bg-accent py-2.5 text-sm font-bold text-accent-foreground">
-              Send Enquiry
-            </button>
+            {submitted ? (
+              <div className="rounded-lg bg-success/10 border border-success/20 p-4 text-center">
+                <p className="font-bold text-success text-sm">Inquiry Sent Successfully!</p>
+                <p className="text-xs text-muted-foreground mt-1">Our agent will contact you shortly.</p>
+              </div>
+            ) : (
+              <>
+                <input
+                  required
+                  value={inquiry.name}
+                  onChange={e => setInquiry(i => ({ ...i, name: e.target.value }))}
+                  placeholder="Your Name *"
+                  className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:border-primary outline-none transition-colors"
+                />
+                <input
+                  required
+                  value={inquiry.phone}
+                  onChange={e => setInquiry(i => ({ ...i, phone: e.target.value }))}
+                  placeholder="Phone Number *"
+                  className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:border-primary outline-none transition-colors"
+                />
+                <input
+                  value={inquiry.email}
+                  onChange={e => setInquiry(i => ({ ...i, email: e.target.value }))}
+                  placeholder="Email (Optional)"
+                  className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:border-primary outline-none transition-colors"
+                />
+                <textarea
+                  rows={3}
+                  value={inquiry.message}
+                  onChange={e => setInquiry(i => ({ ...i, message: e.target.value }))}
+                  placeholder={`I'm interested in listing #${p.listingNumber}...`}
+                  className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:border-primary outline-none transition-colors"
+                />
+                <button 
+                  disabled={isSubmitting}
+                  className="w-full rounded-md bg-accent py-2.5 text-sm font-bold text-accent-foreground disabled:opacity-50 transition-opacity"
+                >
+                  {isSubmitting ? "Sending..." : "Send Enquiry"}
+                </button>
+              </>
+            )}
           </form>
           <Link
             to="/contact"

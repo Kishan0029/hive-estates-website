@@ -1,8 +1,8 @@
 import { createClient } from "@supabase/supabase-js";
 
 // Make sure to only use this in server-side functions/routes
-const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseUrl = (process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL)?.trim();
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
 
 if (!supabaseUrl || !supabaseServiceKey) {
   console.warn("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in server environment.");

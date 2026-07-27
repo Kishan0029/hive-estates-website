@@ -1,10 +1,13 @@
-import { createFileRoute, Outlet, redirect, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect, useRouter, Link } from "@tanstack/react-router";
 import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/admin")({
-  beforeLoad: async () => {
+  beforeLoad: async ({ location }) => {
     const { data: { session } } = await supabase.auth.getSession();
+    if (!session && location.pathname !== "/admin/login") {
+      throw redirect({ to: "/admin/login" });
+    }
     return { session };
   },
   component: AdminLayout,
@@ -15,17 +18,7 @@ function AdminLayout() {
   const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  // If there's no session and we are not on the login page, redirect
-  // Note: Since this is the layout for all /admin routes, we actually do the redirect in a useEffect 
-  // or we can handle it cleanly based on pathname.
-  // Actually, TanStack router beforeLoad can throw redirects, but we want the layout to wrap /admin/login too.
-  // Wait, if /admin/login is a child of /admin, it will inherit this layout. We don't want to redirect if we are already on /admin/login.
-  
-  useEffect(() => {
-    if (!session && window.location.pathname !== "/admin/login") {
-      router.navigate({ to: "/admin/login" });
-    }
-  }, [session, router]);
+  // Auth redirect is now handled perfectly in beforeLoad, no flash!
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -66,6 +59,21 @@ function AdminLayout() {
           </div>
         </div>
       </header>
+
+      {/* Admin Navigation */}
+      <div className="bg-card border-b border-border shadow-sm">
+        <div className="container-p mx-auto px-4 flex gap-6 overflow-x-auto">
+          <Link to="/admin" className="px-4 py-3 text-sm font-bold border-b-2 border-transparent data-[status=active]:border-primary data-[status=active]:text-primary text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap" activeOptions={{ exact: true }}>
+            Dashboard
+          </Link>
+          <Link to="/admin/properties" className="px-4 py-3 text-sm font-bold border-b-2 border-transparent data-[status=active]:border-primary data-[status=active]:text-primary text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap">
+            Properties
+          </Link>
+          <Link to="/admin/inquiries" className="px-4 py-3 text-sm font-bold border-b-2 border-transparent data-[status=active]:border-primary data-[status=active]:text-primary text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap">
+            Inquiries / Leads
+          </Link>
+        </div>
+      </div>
 
       {/* Main Content Area */}
       <main className="flex-1 container-p mx-auto px-4 py-8">

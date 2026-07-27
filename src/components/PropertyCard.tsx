@@ -71,7 +71,7 @@ export function PropertyCard({ p }: { p: Property }) {
             </p>
           </div>
           <div className="text-right shrink-0">
-            <p className="font-display font-bold text-primary">{formatINR(p.price)}</p>
+            <p className="font-display font-bold text-primary">{p.priceOnRequest ? "Request Price" : formatINR(p.price)}</p>
             {p.pricePerSqFt && (
               <p className="text-[11px] text-muted-foreground">₹{p.pricePerSqFt}/sqft</p>
             )}

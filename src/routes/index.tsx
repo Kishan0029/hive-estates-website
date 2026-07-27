@@ -1,15 +1,25 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SearchBar } from "@/components/SearchBar";
 import { PropertyGrid, Section } from "@/components/Section";
-import { LOCALITIES, PROPERTIES } from "@/lib/data";
+import { LOCALITIES, type Property } from "@/lib/data";
+import { getPublicPropertiesFn } from "@/server-fns/public";
 
-export const Route = createFileRoute("/")({ component: Home });
+export const Route = createFileRoute("/")({
+  loader: async () => {
+    const properties = await getPublicPropertiesFn();
+    return { properties };
+  },
+  component: Home,
+});
 
 function Home() {
-  const featuredHomes = PROPERTIES.filter((p) => p.category === "home" && p.featured).slice(0, 4);
-  const featuredLand = PROPERTIES.filter((p) => p.category === "land" && p.featured).slice(0, 4);
-  const latestHomes = PROPERTIES.filter((p) => p.category === "home").slice(0, 4);
-  const latestLand = PROPERTIES.filter((p) => p.category === "land").slice(0, 4);
+  const { properties } = Route.useLoaderData();
+  
+  const p = properties as Property[];
+  const featuredHomes = p.filter((x) => x.category === "home" && x.featured).slice(0, 4);
+  const featuredLand = p.filter((x) => x.category === "land" && x.featured).slice(0, 4);
+  const latestHomes = p.filter((x) => x.category === "home").slice(0, 4);
+  const latestLand = p.filter((x) => x.category === "land").slice(0, 4);
 
   return (
     <>

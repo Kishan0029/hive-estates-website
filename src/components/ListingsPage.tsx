@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { PROPERTIES, searchProperties, type Category, type Property } from "@/lib/data";
 import { PropertyCard } from "./PropertyCard";
 
@@ -26,8 +26,15 @@ const BUDGETS = [
   { label: "Under ₹5 Cr", value: 50000000 },
 ];
 
-export function ListingsPage({ mode, initialQuery = "" }: { mode: Mode; initialQuery?: string }) {
-  const base = useMemo(() => baseFor(mode), [mode]);
+interface ListingsPageProps {
+  mode: Mode;
+  initialQuery?: string;
+  preloadedData?: Property[];
+}
+
+export function ListingsPage({ mode, initialQuery = "", preloadedData }: ListingsPageProps) {
+  const base = useMemo(() => preloadedData ?? baseFor(mode), [mode, preloadedData]);
+  const navigate = useNavigate();
   const [query, setQuery] = useState(initialQuery);
   const [subType, setSubType] = useState<string>("");
   const [bhk, setBhk] = useState("");
@@ -49,7 +56,10 @@ export function ListingsPage({ mode, initialQuery = "" }: { mode: Mode; initialQ
     if (sort === "price-asc") items = [...items].sort((a, b) => a.price - b.price);
     if (sort === "price-desc") items = [...items].sort((a, b) => b.price - a.price);
     if (sort === "area") items = [...items].sort((a, b) => b.area - a.area);
-    return searchProperties(items, query);
+    
+    // We already passed 'query' to the backend and it returned fuzzy matched results.
+    // So 'items' here are already the correct results.
+    return { primary: items, nearby: [] as Property[], matchedLocality: "" };
   }, [base, subType, bhk, ownership, naFilter, max, sort, query]);
 
   const info = TITLES[mode];
@@ -63,6 +73,7 @@ export function ListingsPage({ mode, initialQuery = "" }: { mode: Mode; initialQ
 
   const clearAll = () => {
     setSubType(""); setBhk(""); setOwnership(""); setNaFilter(""); setMax(0); setQuery("");
+    navigate({ search: (prev: any) => ({ ...prev, q: undefined }), replace: true } as any);
   };
 
   const FiltersPanel = () => (
@@ -204,14 +215,20 @@ export function ListingsPage({ mode, initialQuery = "" }: { mode: Mode; initialQ
               </svg>
               <input
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  navigate({ search: (prev: any) => ({ ...prev, q: e.target.value || undefined }), replace: true } as any);
+                }}
                 placeholder="Search by locality, keyword, BHK…"
                 className="w-full rounded-xl border border-border bg-background pl-9 pr-4 py-2.5 text-sm outline-none focus:border-primary transition"
               />
             </div>
             {query && (
               <button
-                onClick={() => setQuery("")}
+                onClick={() => {
+                  setQuery("");
+                  navigate({ search: (prev: any) => ({ ...prev, q: undefined }), replace: true } as any);
+                }}
                 className="rounded-xl border border-border px-4 py-2.5 text-sm text-muted-foreground hover:text-primary hover:border-primary/40 transition"
               >
                 Clear
