@@ -139,3 +139,20 @@ export const getPublicPropertyByIdFn = createServerFn({ method: "GET" })
     }
     return mapDbToFrontendProperty(data);
   });
+
+export const getPublicPropertyBySlugFn = createServerFn({ method: "GET" })
+  .validator((d: { slug: string }) => d)
+  .handler(async (ctx) => {
+    const { slug } = ctx.data;
+    const { data, error } = await serverSupabase
+      .from("properties")
+      .select(`*, property_images(r2_key, is_cover, sort_order)`)
+      .eq("status", "active")
+      .eq("slug", slug)
+      .single();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+    return mapDbToFrontendProperty(data);
+  });

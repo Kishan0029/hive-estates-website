@@ -25,7 +25,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
-import { Route as PropertyIdRouteImport } from './routes/property.$id'
+import { Route as PropertySlugRouteImport } from './routes/property.$slug'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AdminPropertiesIndexRouteImport } from './routes/admin/properties/index'
 import { Route as AdminInquiriesIndexRouteImport } from './routes/admin/inquiries/index'
@@ -112,9 +112,9 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
-const PropertyIdRoute = PropertyIdRouteImport.update({
-  id: '/property/$id',
-  path: '/property/$id',
+const PropertySlugRoute = PropertySlugRouteImport.update({
+  id: '/property/$slug',
+  path: '/property/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
@@ -160,7 +160,7 @@ export interface FileRoutesByFullPath {
   '/projects': typeof ProjectsRoute
   '/terms': typeof TermsRoute
   '/admin/login': typeof AdminLoginRoute
-  '/property/$id': typeof PropertyIdRoute
+  '/property/$slug': typeof PropertySlugRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/properties/new': typeof AdminPropertiesNewRoute
   '/admin/inquiries/': typeof AdminInquiriesIndexRoute
@@ -183,7 +183,7 @@ export interface FileRoutesByTo {
   '/projects': typeof ProjectsRoute
   '/terms': typeof TermsRoute
   '/admin/login': typeof AdminLoginRoute
-  '/property/$id': typeof PropertyIdRoute
+  '/property/$slug': typeof PropertySlugRoute
   '/admin': typeof AdminIndexRoute
   '/admin/properties/new': typeof AdminPropertiesNewRoute
   '/admin/inquiries': typeof AdminInquiriesIndexRoute
@@ -208,7 +208,7 @@ export interface FileRoutesById {
   '/projects': typeof ProjectsRoute
   '/terms': typeof TermsRoute
   '/admin/login': typeof AdminLoginRoute
-  '/property/$id': typeof PropertyIdRoute
+  '/property/$slug': typeof PropertySlugRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/properties/new': typeof AdminPropertiesNewRoute
   '/admin/inquiries/': typeof AdminInquiriesIndexRoute
@@ -234,7 +234,7 @@ export interface FileRouteTypes {
     | '/projects'
     | '/terms'
     | '/admin/login'
-    | '/property/$id'
+    | '/property/$slug'
     | '/admin/'
     | '/admin/properties/new'
     | '/admin/inquiries/'
@@ -257,7 +257,7 @@ export interface FileRouteTypes {
     | '/projects'
     | '/terms'
     | '/admin/login'
-    | '/property/$id'
+    | '/property/$slug'
     | '/admin'
     | '/admin/properties/new'
     | '/admin/inquiries'
@@ -281,7 +281,7 @@ export interface FileRouteTypes {
     | '/projects'
     | '/terms'
     | '/admin/login'
-    | '/property/$id'
+    | '/property/$slug'
     | '/admin/'
     | '/admin/properties/new'
     | '/admin/inquiries/'
@@ -305,7 +305,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   ProjectsRoute: typeof ProjectsRoute
   TermsRoute: typeof TermsRoute
-  PropertyIdRoute: typeof PropertyIdRoute
+  PropertySlugRoute: typeof PropertySlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -422,11 +422,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/property/$id': {
-      id: '/property/$id'
-      path: '/property/$id'
-      fullPath: '/property/$id'
-      preLoaderRoute: typeof PropertyIdRouteImport
+    '/property/$slug': {
+      id: '/property/$slug'
+      path: '/property/$slug'
+      fullPath: '/property/$slug'
+      preLoaderRoute: typeof PropertySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/login': {
@@ -503,7 +503,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   ProjectsRoute: ProjectsRoute,
   TermsRoute: TermsRoute,
-  PropertyIdRoute: PropertyIdRoute,
+  PropertySlugRoute: PropertySlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

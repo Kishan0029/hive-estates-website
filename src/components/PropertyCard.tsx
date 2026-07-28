@@ -21,8 +21,8 @@ export function PropertyCard({ p }: { p: Property }) {
   return (
     <article className="group overflow-hidden rounded-xl border border-border bg-card shadow-card hover:shadow-elevated hover:border-primary/30 transition">
       <Link
-        to="/property/$id"
-        params={{ id: p.id }}
+        to="/property/$slug"
+        params={{ slug: p.slug }}
         className="block relative aspect-[16/10] overflow-hidden bg-muted"
       >
         <img
@@ -59,8 +59,8 @@ export function PropertyCard({ p }: { p: Property }) {
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <Link
-              to="/property/$id"
-              params={{ id: p.id }}
+              to="/property/$slug"
+              params={{ slug: p.slug }}
               className="font-semibold text-foreground line-clamp-1 hover:text-primary"
             >
               {p.title}

@@ -119,8 +119,8 @@ function VerifiedCard({ p }: { p: Property }) {
   return (
     <article className="group flex flex-col sm:flex-row overflow-hidden rounded-2xl border border-border bg-card shadow-card hover:shadow-elevated hover:border-primary/30 transition">
       <Link
-        to="/property/$id"
-        params={{ id: p.id }}
+        to="/property/$slug"
+        params={{ slug: p.slug }}
         className="relative shrink-0 sm:w-52 h-44 sm:h-auto overflow-hidden bg-muted"
       >
         <img src={p.image} alt={p.title} className="h-full w-full object-cover group-hover:scale-105 transition duration-500" />
@@ -135,7 +135,7 @@ function VerifiedCard({ p }: { p: Property }) {
       </Link>
       <div className="flex-1 p-5 flex flex-col justify-between">
         <div>
-          <Link to="/property/$id" params={{ id: p.id }} className="font-bold text-foreground hover:text-primary line-clamp-1">
+          <Link to="/property/$slug" params={{ slug: p.slug }} className="font-bold text-foreground hover:text-primary line-clamp-1">
             {p.title}
           </Link>
           <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">

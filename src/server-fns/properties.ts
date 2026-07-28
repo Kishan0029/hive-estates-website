@@ -49,6 +49,30 @@ export const getNextListingNumberFn = createServerFn({ method: "GET" }).handler(
   return "#0101";
 });
 
+export const getPropertyBySlugFn = createServerFn({ method: "GET" })
+  .validator((d: { slug: string }) => d)
+  .handler(async (ctx) => {
+    const { data, error } = await serverSupabase
+      .from("properties")
+      .select(`*, property_images(r2_key, is_cover, sort_order)`)
+      .eq("slug", ctx.data.slug)
+      .single();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    const r2BaseUrl = process.env.R2_PUBLIC_BASE_URL?.trim() || "";
+    if (data && data.property_images) {
+      data.property_images = data.property_images.map((img: any) => ({
+        ...img,
+        url: `${r2BaseUrl}/${img.r2_key}`
+      }));
+    }
+
+    return data;
+  });
+
 export const getPropertyByIdFn = createServerFn({ method: "GET" })
   .validator((d: { id: string }) => d)
   .handler(async (ctx) => {

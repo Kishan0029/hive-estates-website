@@ -10,13 +10,13 @@ import {
 } from "@/lib/data";
 import { PropertyGrid, Section } from "@/components/Section";
 import { HiveVerifiedBadge } from "@/components/PropertyCard";
-import { getPublicPropertyByIdFn, getPublicPropertiesFn } from "@/server-fns/public";
+import { getPublicPropertyBySlugFn, getPublicPropertiesFn } from "@/server-fns/public";
 import { createInquiryFn } from "@/server-fns/properties";
 
-export const Route = createFileRoute("/property/$id")({
+export const Route = createFileRoute("/property/$slug")({
   loader: async ({ params }) => {
     try {
-      const p = await getPublicPropertyByIdFn({ data: { id: params.id } });
+      const p = await getPublicPropertyBySlugFn({ data: { slug: params.slug } });
       const allProps = await getPublicPropertiesFn();
       const similar = allProps.filter((x: any) => x.id !== p.id && x.category === p.category).slice(0, 4);
       return { property: p, similar };
