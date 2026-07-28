@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as V2_rootRouteImport } from './routes/v2/__root'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -24,14 +25,34 @@ import { Route as AgentsRouteImport } from './routes/agents'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as V2IndexRouteImport } from './routes/v2/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as V2PostPropertyRouteImport } from './routes/v2/post-property'
+import { Route as V2LandRouteImport } from './routes/v2/land'
+import { Route as V2HiveVerifiedRouteImport } from './routes/v2/hive-verified'
+import { Route as V2ContactRouteImport } from './routes/v2/contact'
+import { Route as V2BuyRouteImport } from './routes/v2/buy'
+import { Route as V2ApartmentsRouteImport } from './routes/v2/apartments'
+import { Route as V2AdminRouteImport } from './routes/v2/admin'
+import { Route as V2AboutRouteImport } from './routes/v2/about'
 import { Route as PropertySlugRouteImport } from './routes/property.$slug'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
+import { Route as V2AdminIndexRouteImport } from './routes/v2/admin/index'
 import { Route as AdminPropertiesIndexRouteImport } from './routes/admin/properties/index'
 import { Route as AdminInquiriesIndexRouteImport } from './routes/admin/inquiries/index'
+import { Route as V2PropertySlugRouteImport } from './routes/v2/property.$slug'
+import { Route as V2AdminLoginRouteImport } from './routes/v2/admin/login'
 import { Route as AdminPropertiesNewRouteImport } from './routes/admin/properties/new'
+import { Route as V2AdminPropertiesIndexRouteImport } from './routes/v2/admin/properties/index'
+import { Route as V2AdminInquiriesIndexRouteImport } from './routes/v2/admin/inquiries/index'
+import { Route as V2AdminPropertiesNewRouteImport } from './routes/v2/admin/properties/new'
 import { Route as AdminPropertiesIdEditRouteImport } from './routes/admin/properties/$id.edit'
+import { Route as V2AdminPropertiesIdEditRouteImport } from './routes/v2/admin/properties/$id.edit'
 
+const V2_rootRoute = V2_rootRouteImport.update({
+  id: '/v2/__root',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
@@ -107,10 +128,55 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const V2IndexRoute = V2IndexRouteImport.update({
+  id: '/v2/',
+  path: '/v2/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRoute,
+} as any)
+const V2PostPropertyRoute = V2PostPropertyRouteImport.update({
+  id: '/v2/post-property',
+  path: '/v2/post-property',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const V2LandRoute = V2LandRouteImport.update({
+  id: '/v2/land',
+  path: '/v2/land',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const V2HiveVerifiedRoute = V2HiveVerifiedRouteImport.update({
+  id: '/v2/hive-verified',
+  path: '/v2/hive-verified',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const V2ContactRoute = V2ContactRouteImport.update({
+  id: '/v2/contact',
+  path: '/v2/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const V2BuyRoute = V2BuyRouteImport.update({
+  id: '/v2/buy',
+  path: '/v2/buy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const V2ApartmentsRoute = V2ApartmentsRouteImport.update({
+  id: '/v2/apartments',
+  path: '/v2/apartments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const V2AdminRoute = V2AdminRouteImport.update({
+  id: '/v2/admin',
+  path: '/v2/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const V2AboutRoute = V2AboutRouteImport.update({
+  id: '/v2/about',
+  path: '/v2/about',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const PropertySlugRoute = PropertySlugRouteImport.update({
   id: '/property/$slug',
@@ -122,6 +188,11 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AdminRoute,
 } as any)
+const V2AdminIndexRoute = V2AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => V2AdminRoute,
+} as any)
 const AdminPropertiesIndexRoute = AdminPropertiesIndexRouteImport.update({
   id: '/properties/',
   path: '/properties/',
@@ -132,15 +203,45 @@ const AdminInquiriesIndexRoute = AdminInquiriesIndexRouteImport.update({
   path: '/inquiries/',
   getParentRoute: () => AdminRoute,
 } as any)
+const V2PropertySlugRoute = V2PropertySlugRouteImport.update({
+  id: '/v2/property/$slug',
+  path: '/v2/property/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const V2AdminLoginRoute = V2AdminLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => V2AdminRoute,
+} as any)
 const AdminPropertiesNewRoute = AdminPropertiesNewRouteImport.update({
   id: '/properties/new',
   path: '/properties/new',
   getParentRoute: () => AdminRoute,
 } as any)
+const V2AdminPropertiesIndexRoute = V2AdminPropertiesIndexRouteImport.update({
+  id: '/properties/',
+  path: '/properties/',
+  getParentRoute: () => V2AdminRoute,
+} as any)
+const V2AdminInquiriesIndexRoute = V2AdminInquiriesIndexRouteImport.update({
+  id: '/inquiries/',
+  path: '/inquiries/',
+  getParentRoute: () => V2AdminRoute,
+} as any)
+const V2AdminPropertiesNewRoute = V2AdminPropertiesNewRouteImport.update({
+  id: '/properties/new',
+  path: '/properties/new',
+  getParentRoute: () => V2AdminRoute,
+} as any)
 const AdminPropertiesIdEditRoute = AdminPropertiesIdEditRouteImport.update({
   id: '/properties/$id/edit',
   path: '/properties/$id/edit',
   getParentRoute: () => AdminRoute,
+} as any)
+const V2AdminPropertiesIdEditRoute = V2AdminPropertiesIdEditRouteImport.update({
+  id: '/properties/$id/edit',
+  path: '/properties/$id/edit',
+  getParentRoute: () => V2AdminRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -161,11 +262,28 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/admin/login': typeof AdminLoginRoute
   '/property/$slug': typeof PropertySlugRoute
+  '/v2': typeof V2_rootRoute
+  '/v2/about': typeof V2AboutRoute
+  '/v2/admin': typeof V2AdminRouteWithChildren
+  '/v2/apartments': typeof V2ApartmentsRoute
+  '/v2/buy': typeof V2BuyRoute
+  '/v2/contact': typeof V2ContactRoute
+  '/v2/hive-verified': typeof V2HiveVerifiedRoute
+  '/v2/land': typeof V2LandRoute
+  '/v2/post-property': typeof V2PostPropertyRoute
   '/admin/': typeof AdminIndexRoute
+  '/v2/': typeof V2IndexRoute
   '/admin/properties/new': typeof AdminPropertiesNewRoute
+  '/v2/admin/login': typeof V2AdminLoginRoute
+  '/v2/property/$slug': typeof V2PropertySlugRoute
   '/admin/inquiries/': typeof AdminInquiriesIndexRoute
   '/admin/properties/': typeof AdminPropertiesIndexRoute
+  '/v2/admin/': typeof V2AdminIndexRoute
   '/admin/properties/$id/edit': typeof AdminPropertiesIdEditRoute
+  '/v2/admin/properties/new': typeof V2AdminPropertiesNewRoute
+  '/v2/admin/inquiries/': typeof V2AdminInquiriesIndexRoute
+  '/v2/admin/properties/': typeof V2AdminPropertiesIndexRoute
+  '/v2/admin/properties/$id/edit': typeof V2AdminPropertiesIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -184,11 +302,26 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/admin/login': typeof AdminLoginRoute
   '/property/$slug': typeof PropertySlugRoute
+  '/v2': typeof V2IndexRoute
+  '/v2/about': typeof V2AboutRoute
+  '/v2/apartments': typeof V2ApartmentsRoute
+  '/v2/buy': typeof V2BuyRoute
+  '/v2/contact': typeof V2ContactRoute
+  '/v2/hive-verified': typeof V2HiveVerifiedRoute
+  '/v2/land': typeof V2LandRoute
+  '/v2/post-property': typeof V2PostPropertyRoute
   '/admin': typeof AdminIndexRoute
   '/admin/properties/new': typeof AdminPropertiesNewRoute
+  '/v2/admin/login': typeof V2AdminLoginRoute
+  '/v2/property/$slug': typeof V2PropertySlugRoute
   '/admin/inquiries': typeof AdminInquiriesIndexRoute
   '/admin/properties': typeof AdminPropertiesIndexRoute
+  '/v2/admin': typeof V2AdminIndexRoute
   '/admin/properties/$id/edit': typeof AdminPropertiesIdEditRoute
+  '/v2/admin/properties/new': typeof V2AdminPropertiesNewRoute
+  '/v2/admin/inquiries': typeof V2AdminInquiriesIndexRoute
+  '/v2/admin/properties': typeof V2AdminPropertiesIndexRoute
+  '/v2/admin/properties/$id/edit': typeof V2AdminPropertiesIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -209,11 +342,28 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/admin/login': typeof AdminLoginRoute
   '/property/$slug': typeof PropertySlugRoute
+  '/v2/__root': typeof V2_rootRoute
+  '/v2/about': typeof V2AboutRoute
+  '/v2/admin': typeof V2AdminRouteWithChildren
+  '/v2/apartments': typeof V2ApartmentsRoute
+  '/v2/buy': typeof V2BuyRoute
+  '/v2/contact': typeof V2ContactRoute
+  '/v2/hive-verified': typeof V2HiveVerifiedRoute
+  '/v2/land': typeof V2LandRoute
+  '/v2/post-property': typeof V2PostPropertyRoute
   '/admin/': typeof AdminIndexRoute
+  '/v2/': typeof V2IndexRoute
   '/admin/properties/new': typeof AdminPropertiesNewRoute
+  '/v2/admin/login': typeof V2AdminLoginRoute
+  '/v2/property/$slug': typeof V2PropertySlugRoute
   '/admin/inquiries/': typeof AdminInquiriesIndexRoute
   '/admin/properties/': typeof AdminPropertiesIndexRoute
+  '/v2/admin/': typeof V2AdminIndexRoute
   '/admin/properties/$id/edit': typeof AdminPropertiesIdEditRoute
+  '/v2/admin/properties/new': typeof V2AdminPropertiesNewRoute
+  '/v2/admin/inquiries/': typeof V2AdminInquiriesIndexRoute
+  '/v2/admin/properties/': typeof V2AdminPropertiesIndexRoute
+  '/v2/admin/properties/$id/edit': typeof V2AdminPropertiesIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -235,11 +385,28 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin/login'
     | '/property/$slug'
+    | '/v2'
+    | '/v2/about'
+    | '/v2/admin'
+    | '/v2/apartments'
+    | '/v2/buy'
+    | '/v2/contact'
+    | '/v2/hive-verified'
+    | '/v2/land'
+    | '/v2/post-property'
     | '/admin/'
+    | '/v2/'
     | '/admin/properties/new'
+    | '/v2/admin/login'
+    | '/v2/property/$slug'
     | '/admin/inquiries/'
     | '/admin/properties/'
+    | '/v2/admin/'
     | '/admin/properties/$id/edit'
+    | '/v2/admin/properties/new'
+    | '/v2/admin/inquiries/'
+    | '/v2/admin/properties/'
+    | '/v2/admin/properties/$id/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -258,11 +425,26 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin/login'
     | '/property/$slug'
+    | '/v2'
+    | '/v2/about'
+    | '/v2/apartments'
+    | '/v2/buy'
+    | '/v2/contact'
+    | '/v2/hive-verified'
+    | '/v2/land'
+    | '/v2/post-property'
     | '/admin'
     | '/admin/properties/new'
+    | '/v2/admin/login'
+    | '/v2/property/$slug'
     | '/admin/inquiries'
     | '/admin/properties'
+    | '/v2/admin'
     | '/admin/properties/$id/edit'
+    | '/v2/admin/properties/new'
+    | '/v2/admin/inquiries'
+    | '/v2/admin/properties'
+    | '/v2/admin/properties/$id/edit'
   id:
     | '__root__'
     | '/'
@@ -282,11 +464,28 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin/login'
     | '/property/$slug'
+    | '/v2/__root'
+    | '/v2/about'
+    | '/v2/admin'
+    | '/v2/apartments'
+    | '/v2/buy'
+    | '/v2/contact'
+    | '/v2/hive-verified'
+    | '/v2/land'
+    | '/v2/post-property'
     | '/admin/'
+    | '/v2/'
     | '/admin/properties/new'
+    | '/v2/admin/login'
+    | '/v2/property/$slug'
     | '/admin/inquiries/'
     | '/admin/properties/'
+    | '/v2/admin/'
     | '/admin/properties/$id/edit'
+    | '/v2/admin/properties/new'
+    | '/v2/admin/inquiries/'
+    | '/v2/admin/properties/'
+    | '/v2/admin/properties/$id/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -306,10 +505,28 @@ export interface RootRouteChildren {
   ProjectsRoute: typeof ProjectsRoute
   TermsRoute: typeof TermsRoute
   PropertySlugRoute: typeof PropertySlugRoute
+  V2_rootRoute: typeof V2_rootRoute
+  V2AboutRoute: typeof V2AboutRoute
+  V2AdminRoute: typeof V2AdminRouteWithChildren
+  V2ApartmentsRoute: typeof V2ApartmentsRoute
+  V2BuyRoute: typeof V2BuyRoute
+  V2ContactRoute: typeof V2ContactRoute
+  V2HiveVerifiedRoute: typeof V2HiveVerifiedRoute
+  V2LandRoute: typeof V2LandRoute
+  V2PostPropertyRoute: typeof V2PostPropertyRoute
+  V2IndexRoute: typeof V2IndexRoute
+  V2PropertySlugRoute: typeof V2PropertySlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/v2/__root': {
+      id: '/v2/__root'
+      path: '/v2'
+      fullPath: '/v2'
+      preLoaderRoute: typeof V2_rootRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terms': {
       id: '/terms'
       path: '/terms'
@@ -415,12 +632,75 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/v2/': {
+      id: '/v2/'
+      path: '/v2'
+      fullPath: '/v2/'
+      preLoaderRoute: typeof V2IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/': {
       id: '/admin/'
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/v2/post-property': {
+      id: '/v2/post-property'
+      path: '/v2/post-property'
+      fullPath: '/v2/post-property'
+      preLoaderRoute: typeof V2PostPropertyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/v2/land': {
+      id: '/v2/land'
+      path: '/v2/land'
+      fullPath: '/v2/land'
+      preLoaderRoute: typeof V2LandRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/v2/hive-verified': {
+      id: '/v2/hive-verified'
+      path: '/v2/hive-verified'
+      fullPath: '/v2/hive-verified'
+      preLoaderRoute: typeof V2HiveVerifiedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/v2/contact': {
+      id: '/v2/contact'
+      path: '/v2/contact'
+      fullPath: '/v2/contact'
+      preLoaderRoute: typeof V2ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/v2/buy': {
+      id: '/v2/buy'
+      path: '/v2/buy'
+      fullPath: '/v2/buy'
+      preLoaderRoute: typeof V2BuyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/v2/apartments': {
+      id: '/v2/apartments'
+      path: '/v2/apartments'
+      fullPath: '/v2/apartments'
+      preLoaderRoute: typeof V2ApartmentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/v2/admin': {
+      id: '/v2/admin'
+      path: '/v2/admin'
+      fullPath: '/v2/admin'
+      preLoaderRoute: typeof V2AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/v2/about': {
+      id: '/v2/about'
+      path: '/v2/about'
+      fullPath: '/v2/about'
+      preLoaderRoute: typeof V2AboutRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/property/$slug': {
       id: '/property/$slug'
@@ -436,6 +716,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/v2/admin/': {
+      id: '/v2/admin/'
+      path: '/'
+      fullPath: '/v2/admin/'
+      preLoaderRoute: typeof V2AdminIndexRouteImport
+      parentRoute: typeof V2AdminRoute
+    }
     '/admin/properties/': {
       id: '/admin/properties/'
       path: '/properties'
@@ -450,6 +737,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminInquiriesIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/v2/property/$slug': {
+      id: '/v2/property/$slug'
+      path: '/v2/property/$slug'
+      fullPath: '/v2/property/$slug'
+      preLoaderRoute: typeof V2PropertySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/v2/admin/login': {
+      id: '/v2/admin/login'
+      path: '/login'
+      fullPath: '/v2/admin/login'
+      preLoaderRoute: typeof V2AdminLoginRouteImport
+      parentRoute: typeof V2AdminRoute
+    }
     '/admin/properties/new': {
       id: '/admin/properties/new'
       path: '/properties/new'
@@ -457,12 +758,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPropertiesNewRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/v2/admin/properties/': {
+      id: '/v2/admin/properties/'
+      path: '/properties'
+      fullPath: '/v2/admin/properties/'
+      preLoaderRoute: typeof V2AdminPropertiesIndexRouteImport
+      parentRoute: typeof V2AdminRoute
+    }
+    '/v2/admin/inquiries/': {
+      id: '/v2/admin/inquiries/'
+      path: '/inquiries'
+      fullPath: '/v2/admin/inquiries/'
+      preLoaderRoute: typeof V2AdminInquiriesIndexRouteImport
+      parentRoute: typeof V2AdminRoute
+    }
+    '/v2/admin/properties/new': {
+      id: '/v2/admin/properties/new'
+      path: '/properties/new'
+      fullPath: '/v2/admin/properties/new'
+      preLoaderRoute: typeof V2AdminPropertiesNewRouteImport
+      parentRoute: typeof V2AdminRoute
+    }
     '/admin/properties/$id/edit': {
       id: '/admin/properties/$id/edit'
       path: '/properties/$id/edit'
       fullPath: '/admin/properties/$id/edit'
       preLoaderRoute: typeof AdminPropertiesIdEditRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/v2/admin/properties/$id/edit': {
+      id: '/v2/admin/properties/$id/edit'
+      path: '/properties/$id/edit'
+      fullPath: '/v2/admin/properties/$id/edit'
+      preLoaderRoute: typeof V2AdminPropertiesIdEditRouteImport
+      parentRoute: typeof V2AdminRoute
     }
   }
 }
@@ -487,6 +816,27 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface V2AdminRouteChildren {
+  V2AdminLoginRoute: typeof V2AdminLoginRoute
+  V2AdminIndexRoute: typeof V2AdminIndexRoute
+  V2AdminPropertiesNewRoute: typeof V2AdminPropertiesNewRoute
+  V2AdminInquiriesIndexRoute: typeof V2AdminInquiriesIndexRoute
+  V2AdminPropertiesIndexRoute: typeof V2AdminPropertiesIndexRoute
+  V2AdminPropertiesIdEditRoute: typeof V2AdminPropertiesIdEditRoute
+}
+
+const V2AdminRouteChildren: V2AdminRouteChildren = {
+  V2AdminLoginRoute: V2AdminLoginRoute,
+  V2AdminIndexRoute: V2AdminIndexRoute,
+  V2AdminPropertiesNewRoute: V2AdminPropertiesNewRoute,
+  V2AdminInquiriesIndexRoute: V2AdminInquiriesIndexRoute,
+  V2AdminPropertiesIndexRoute: V2AdminPropertiesIndexRoute,
+  V2AdminPropertiesIdEditRoute: V2AdminPropertiesIdEditRoute,
+}
+
+const V2AdminRouteWithChildren =
+  V2AdminRoute._addFileChildren(V2AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -504,6 +854,17 @@ const rootRouteChildren: RootRouteChildren = {
   ProjectsRoute: ProjectsRoute,
   TermsRoute: TermsRoute,
   PropertySlugRoute: PropertySlugRoute,
+  V2_rootRoute: V2_rootRoute,
+  V2AboutRoute: V2AboutRoute,
+  V2AdminRoute: V2AdminRouteWithChildren,
+  V2ApartmentsRoute: V2ApartmentsRoute,
+  V2BuyRoute: V2BuyRoute,
+  V2ContactRoute: V2ContactRoute,
+  V2HiveVerifiedRoute: V2HiveVerifiedRoute,
+  V2LandRoute: V2LandRoute,
+  V2PostPropertyRoute: V2PostPropertyRoute,
+  V2IndexRoute: V2IndexRoute,
+  V2PropertySlugRoute: V2PropertySlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
