@@ -24,6 +24,31 @@ export const getAdminPropertiesFn = createServerFn({ method: "GET" }).handler(as
   return data;
 });
 
+export const getNextListingNumberFn = createServerFn({ method: "GET" }).handler(async () => {
+  const { data, error } = await serverSupabase
+    .from("properties")
+    .select("listing_number")
+    .not("listing_number", "is", null)
+    .order("listing_number", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error && error.code !== 'PGRST116') {
+    // Ignore no rows found error
+    console.error("Error fetching next listing number:", error);
+  }
+
+  if (data && data.listing_number) {
+    const numPart = data.listing_number.replace(/[^0-9]/g, "");
+    const nextNum = parseInt(numPart, 10) + 1;
+    if (!isNaN(nextNum)) {
+      return `#${String(nextNum).padStart(4, "0")}`;
+    }
+  }
+  
+  return "#0101";
+});
+
 export const getPropertyByIdFn = createServerFn({ method: "GET" })
   .validator((d: { id: string }) => d)
   .handler(async (ctx) => {
@@ -92,6 +117,7 @@ export const createPropertyFn = createServerFn({ method: "POST" })
     .from("properties")
     .insert([
       {
+        listing_number: data.listing_number,
         title: data.title,
         slug: data.slug,
         property_type: data.property_type,

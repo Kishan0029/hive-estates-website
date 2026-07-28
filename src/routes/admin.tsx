@@ -11,6 +11,19 @@ export const Route = createFileRoute("/admin")({
     return { session };
   },
   component: AdminLayout,
+  errorComponent: ({ error }) => {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+        <div className="w-full max-w-md bg-destructive/10 text-destructive p-6 rounded-3xl border border-destructive/20 text-center">
+          <h2 className="font-bold text-lg mb-2">Dashboard Error</h2>
+          <p className="text-sm opacity-90 mb-4">{error.message}</p>
+          <p className="text-xs opacity-75">
+            If this happens on a deployed site, ensure you have set all required environment variables like <code>SUPABASE_SERVICE_ROLE_KEY</code> in your hosting provider's dashboard.
+          </p>
+        </div>
+      </div>
+    );
+  }
 });
 
 function AdminLayout() {

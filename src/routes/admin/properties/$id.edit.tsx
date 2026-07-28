@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getPropertyByIdFn, updatePropertyFn, uploadImageToServerFn } from "@/server-fns/properties";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,6 +13,7 @@ export const Route = createFileRoute("/admin/properties/$id/edit")({
 });
 
 const schema = z.object({
+  listing_number: z.string().optional().nullable(),
   title: z.string().min(5, "Title must be at least 5 characters"),
   slug: z.string().min(3, "Slug is required"),
   property_type: z.enum(["apartment", "villa", "plot", "commercial"]),
@@ -61,9 +62,10 @@ function EditProperty() {
   const [uploading, setUploading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const { register, handleSubmit, watch, reset, formState: { errors, isSubmitting } } = useForm({
+  const { register, handleSubmit, watch, reset, setValue, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
+      listing_number: property.listing_number,
       title: property.title,
       slug: property.slug,
       property_type: property.property_type,
@@ -103,6 +105,15 @@ function EditProperty() {
   });
 
   const propertyType = watch("property_type");
+  const title = watch("title");
+
+  // Auto-generate slug from title
+  useEffect(() => {
+    if (title) {
+      const generatedSlug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+      setValue("slug", generatedSlug, { shouldValidate: true });
+    }
+  }, [title, setValue]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -202,6 +213,11 @@ function EditProperty() {
             <h2 className="font-bold">Basic Details</h2>
           </div>
           <div className="p-8 grid md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Listing Number</label>
+              <input {...register("listing_number")} readOnly className="w-full rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm focus:border-primary transition outline-none cursor-not-allowed font-mono font-bold" />
+            </div>
+
             <div className="md:col-span-2">
               <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Title</label>
               <input {...register("title")} className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:border-primary transition outline-none" placeholder="e.g. 3 BHK Luxury Villa" />
