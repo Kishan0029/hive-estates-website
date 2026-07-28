@@ -95,7 +95,7 @@ export const uploadImageToServerFn = createServerFn({ method: "POST" })
       const { r2Client } = await import("./r2");
       
       const command = new PutObjectCommand({
-        Bucket: process.env.R2_BUCKET_NAME,
+        Bucket: process.env.R2_BUCKET_NAME?.trim(),
         Key: r2Key,
         ContentType: ctx.data.contentType,
         Body: buffer,
