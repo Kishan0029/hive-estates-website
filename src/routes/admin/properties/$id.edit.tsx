@@ -72,6 +72,9 @@ function EditProperty() {
   const navigate = useNavigate();
   
   const [images, setImages] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<any[]>(
+    property.property_images ? [...property.property_images].sort((a: any, b: any) => a.sort_order - b.sort_order) : []
+  );
   const [uploading, setUploading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -149,31 +152,25 @@ function EditProperty() {
     });
   };
 
-  const uploadImagesToR2 = async () => {
-    const uploadedKeys: string[] = [];
-    for (const file of images) {
-      const base64 = await fileToBase64(file);
-      const { r2Key } = await uploadImageToServerFn({ 
-        data: { 
-          filename: file.name, 
-          contentType: file.type, 
-          base64 
-        } 
-      });
-      uploadedKeys.push(r2Key);
-    }
-    return uploadedKeys;
-  };
-
   const onSubmit = async (data: any) => {
     setSubmitError(null);
     setUploading(true);
     try {
-      let imageKeys: string[] | undefined = undefined;
+      const newImageKeys: string[] = [];
       
-      if (images.length > 0) {
-        imageKeys = await uploadImagesToR2();
+      for (const file of images) {
+        const base64 = await fileToBase64(file);
+        const res = await uploadImageToServerFn({ 
+          data: { 
+            filename: file.name, 
+            contentType: file.type, 
+            base64 
+          } 
+        });
+        newImageKeys.push(res.r2Key);
       }
+
+      const allImageKeys = [...existingImages.map(img => img.r2_key), ...newImageKeys];
 
       await updatePropertyFn({
         data: {
@@ -184,7 +181,7 @@ function EditProperty() {
             area_sqft: data.area_sqft ? Number(data.area_sqft) : undefined,
             amenities: data.amenities ? data.amenities.split(',').map((a: string) => a.trim()).filter(Boolean) : [],
           },
-          imageKeys
+          imageKeys: allImageKeys
         }
       });
       
@@ -466,35 +463,40 @@ function EditProperty() {
          {/* MEDIA */}
         <div className="rounded-3xl border border-border bg-card shadow-sm overflow-hidden">
           <div className="px-8 py-5 border-b border-border bg-muted/20">
-            <h2 className="font-bold">Media (Re-uploading overwrites old images)</h2>
+            <h2 className="font-bold">Media</h2>
           </div>
           <div className="p-8">
-             {property.property_images && property.property_images.length > 0 && images.length === 0 && (
+             {existingImages.length > 0 && (
                <div className="mb-6">
                  <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Existing Images</label>
                  <div className="flex gap-4 overflow-x-auto py-2">
-                   {property.property_images.map((img: any) => (
-                     <div key={img.r2_key} className="shrink-0 w-24 h-24 rounded-xl border border-border overflow-hidden relative">
+                   {existingImages.map((img: any, i) => (
+                     <div key={img.r2_key} className="shrink-0 w-24 h-24 rounded-xl border border-border overflow-hidden relative group">
                        <img src={img.url} alt="existing" className="w-full h-full object-cover" />
                        {img.is_cover && (
-                         <div className="absolute bottom-0 inset-x-0 bg-primary/80 text-white text-[10px] font-bold text-center py-0.5">
+                         <div className="absolute bottom-0 inset-x-0 bg-primary/80 text-white text-[10px] font-bold text-center py-0.5 pointer-events-none">
                            COVER
                          </div>
                        )}
+                       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <button type="button" onClick={() => setExistingImages(existingImages.filter((_, idx) => idx !== i))} className="text-white hover:text-destructive transition-colors">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                          </button>
+                       </div>
                      </div>
                    ))}
                  </div>
                </div>
              )}
 
-             <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Upload New Images (Optional)</label>
+             <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Add New Images</label>
              <div className="border-2 border-dashed border-border rounded-2xl p-10 text-center hover:bg-muted/10 transition cursor-pointer relative">
                 <input type="file" multiple accept="image/*" onChange={handleImageChange} className="absolute inset-0 opacity-0 cursor-pointer" />
                 <div className="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                 </div>
-                <p className="font-bold text-foreground">Click or drag images here to overwrite</p>
-                <p className="text-sm text-muted-foreground mt-1">Leave empty to keep existing images.</p>
+                <p className="font-bold text-foreground">Click or drag images here to add more</p>
+                <p className="text-sm text-muted-foreground mt-1">New images will be appended to the existing ones.</p>
              </div>
              {images.length > 0 && (
                <div className="mt-4 flex gap-4 overflow-x-auto py-2">

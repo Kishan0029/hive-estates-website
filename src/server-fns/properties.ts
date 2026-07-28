@@ -257,17 +257,19 @@ export const updatePropertyFn = createServerFn({ method: "POST" })
       throw new Error(propErr.message);
     }
 
-    if (imageKeys && imageKeys.length > 0) {
+    if (imageKeys !== undefined) {
       await serverSupabase.from("property_images").delete().eq("property_id", id);
       
-      const imagesToInsert = imageKeys.map((key, index) => ({
-        property_id: id,
-        r2_key: key,
-        sort_order: index,
-        is_cover: index === 0,
-      }));
+      if (imageKeys.length > 0) {
+        const imagesToInsert = imageKeys.map((key, index) => ({
+          property_id: id,
+          r2_key: key,
+          sort_order: index,
+          is_cover: index === 0,
+        }));
 
-      await serverSupabase.from("property_images").insert(imagesToInsert);
+        await serverSupabase.from("property_images").insert(imagesToInsert);
+      }
     }
 
     return { success: true };
