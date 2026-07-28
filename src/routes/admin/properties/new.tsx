@@ -24,7 +24,7 @@ const schema = z.object({
   slug: z.string().min(3, "Slug is required"),
   property_type: z.enum(["apartment", "villa", "plot", "commercial"]),
   listing_type: z.enum(["sale", "rent"]),
-  price: z.number({ invalid_type_error: "Price is required" }).min(1, "Price must be greater than 0"),
+  price: optionalNumber,
   area_sqft: optionalNumber,
   city: z.string().min(2, "City is required"),
   status: z.enum(["draft", "active", "sold", "rented"]),
@@ -55,6 +55,14 @@ const schema = z.object({
   shopping: z.string().optional(),
   connectivity: z.string().optional(),
   road_width: optionalNumber,
+}).superRefine((data, ctx) => {
+  if (!data.price_on_request && (!data.price || data.price <= 0)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Price must be greater than 0 when 'Price on Request' is not checked",
+      path: ["price"]
+    });
+  }
 });
 
 // Remove FormValues type
@@ -87,6 +95,7 @@ function AddProperty() {
   
   const propertyType = watch("property_type");
   const title = watch("title");
+  const priceOnRequest = watch("price_on_request");
 
   // Auto-generate slug from title
   useEffect(() => {
@@ -142,6 +151,7 @@ function AddProperty() {
         data: {
           data: {
             ...data,
+            price: data.price_on_request ? 0 : data.price,
             area_sqft: data.area_sqft ? Number(data.area_sqft) : undefined,
             amenities: data.amenities ? data.amenities.split(',').map((a: string) => a.trim()).filter(Boolean) : [],
           },
@@ -228,7 +238,8 @@ function AddProperty() {
 
             <div>
               <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Price (INR)</label>
-              <input type="number" {...register("price", { valueAsNumber: true })} className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:border-primary transition outline-none" placeholder="0" />
+              <input type="number" {...register("price", { valueAsNumber: true })} disabled={priceOnRequest} className={`w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:border-primary transition outline-none ${priceOnRequest ? "opacity-50 cursor-not-allowed bg-muted" : ""}`} placeholder={priceOnRequest ? "Price on Request" : "0"} />
+              {errors.price && <p className="text-destructive text-xs mt-1">{errors.price.message}</p>}
             </div>
 
             <div>

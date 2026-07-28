@@ -5,6 +5,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
+const optionalNumber = z.preprocess(
+  (val) => (val === "" || val === undefined || val === null || Number.isNaN(Number(val))) ? null : Number(val),
+  z.number().nullable()
+);
+
 export const Route = createFileRoute("/admin/properties/$id/edit")({
   loader: async ({ params }) => {
     return await getPropertyByIdFn({ data: { id: params.id } });
@@ -18,15 +23,15 @@ const schema = z.object({
   slug: z.string().min(3, "Slug is required"),
   property_type: z.enum(["apartment", "villa", "plot", "commercial"]),
   listing_type: z.enum(["sale", "rent"]),
-  price: z.number({ invalid_type_error: "Price is required" }).min(1, "Price must be greater than 0"),
-  area_sqft: z.number({ invalid_type_error: "Area must be a number" }).optional().nullable(),
+  price: optionalNumber,
+  area_sqft: optionalNumber,
   city: z.string().min(2, "City is required"),
   status: z.enum(["draft", "active", "sold", "rented"]),
   price_on_request: z.boolean(),
   description: z.string().optional().nullable(),
-  bhk: z.number({ invalid_type_error: "BHK must be a number" }).optional().nullable(),
-  bathrooms: z.number({ invalid_type_error: "Bathrooms must be a number" }).optional().nullable(),
-  parking: z.number({ invalid_type_error: "Parking must be a number" }).optional().nullable(),
+  bhk: optionalNumber,
+  bathrooms: optionalNumber,
+  parking: optionalNumber,
   facing_direction: z.string().optional().nullable(),
   furnishing: z.string().optional().nullable(),
   property_age: z.string().optional().nullable(),
@@ -48,7 +53,15 @@ const schema = z.object({
   hospitals: z.string().optional().nullable(),
   shopping: z.string().optional().nullable(),
   connectivity: z.string().optional().nullable(),
-  road_width: z.number({ invalid_type_error: "Road width must be a number" }).optional().nullable(),
+  road_width: optionalNumber,
+}).superRefine((data, ctx) => {
+  if (!data.price_on_request && (!data.price || data.price <= 0)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Price must be greater than 0 when 'Price on Request' is not checked",
+      path: ["price"]
+    });
+  }
 });
 
 // Remove FormValues type
@@ -106,6 +119,7 @@ function EditProperty() {
 
   const propertyType = watch("property_type");
   const title = watch("title");
+  const priceOnRequest = watch("price_on_request");
 
   // Auto-generate slug from title
   useEffect(() => {
@@ -166,6 +180,7 @@ function EditProperty() {
           id,
           data: {
             ...data,
+            price: data.price_on_request ? 0 : data.price,
             area_sqft: data.area_sqft ? Number(data.area_sqft) : undefined,
             amenities: data.amenities ? data.amenities.split(',').map((a: string) => a.trim()).filter(Boolean) : [],
           },
@@ -252,7 +267,8 @@ function EditProperty() {
 
             <div>
               <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Price (INR)</label>
-              <input type="number" {...register("price", { valueAsNumber: true })} className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:border-primary transition outline-none" placeholder="0" />
+              <input type="number" {...register("price", { valueAsNumber: true })} disabled={priceOnRequest} className={`w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:border-primary transition outline-none ${priceOnRequest ? "opacity-50 cursor-not-allowed bg-muted" : ""}`} placeholder={priceOnRequest ? "Price on Request" : "0"} />
+              {errors.price && <p className="text-destructive text-xs mt-1">{errors.price.message}</p>}
             </div>
 
             <div>
@@ -447,12 +463,30 @@ function EditProperty() {
           </div>
         </div>
 
-        {/* MEDIA */}
+         {/* MEDIA */}
         <div className="rounded-3xl border border-border bg-card shadow-sm overflow-hidden">
           <div className="px-8 py-5 border-b border-border bg-muted/20">
             <h2 className="font-bold">Media (Re-uploading overwrites old images)</h2>
           </div>
           <div className="p-8">
+             {property.property_images && property.property_images.length > 0 && images.length === 0 && (
+               <div className="mb-6">
+                 <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Existing Images</label>
+                 <div className="flex gap-4 overflow-x-auto py-2">
+                   {property.property_images.map((img: any) => (
+                     <div key={img.r2_key} className="shrink-0 w-24 h-24 rounded-xl border border-border overflow-hidden relative">
+                       <img src={img.url} alt="existing" className="w-full h-full object-cover" />
+                       {img.is_cover && (
+                         <div className="absolute bottom-0 inset-x-0 bg-primary/80 text-white text-[10px] font-bold text-center py-0.5">
+                           COVER
+                         </div>
+                       )}
+                     </div>
+                   ))}
+                 </div>
+               </div>
+             )}
+
              <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Upload New Images (Optional)</label>
              <div className="border-2 border-dashed border-border rounded-2xl p-10 text-center hover:bg-muted/10 transition cursor-pointer relative">
                 <input type="file" multiple accept="image/*" onChange={handleImageChange} className="absolute inset-0 opacity-0 cursor-pointer" />

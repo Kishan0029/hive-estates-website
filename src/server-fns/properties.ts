@@ -61,6 +61,15 @@ export const getPropertyByIdFn = createServerFn({ method: "GET" })
     if (error) {
       throw new Error(error.message);
     }
+
+    const r2BaseUrl = process.env.R2_PUBLIC_BASE_URL?.trim() || "";
+    if (data && data.property_images) {
+      data.property_images = data.property_images.map((img: any) => ({
+        ...img,
+        url: `${r2BaseUrl}/${img.r2_key}`
+      }));
+    }
+
     return data;
   });
 
